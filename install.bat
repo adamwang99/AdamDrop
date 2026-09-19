@@ -14,8 +14,9 @@ if %errorlevel% neq 0 (
 set PORT=8765
 set CSC=%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe
 if not exist "%CSC%" set CSC=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\csc.exe
-if not exist "%CSC%" (
-  echo [LOI] Khong tim thay trinh bien dich C# cua .NET Framework 4.
+if not exist "%CSC%" if not exist "AdamDrop.exe" (
+  echo [LOI] May nay khong co csc.exe cua .NET Framework 4 va goi nay cung khong co
+  echo       san AdamDrop.exe. Hay bat .NET Framework 4 trong Windows Features roi chay lai.
   pause
   exit /b 1
 )
@@ -24,17 +25,23 @@ echo [1/6] Dung cac ban dang chay (AdamDrop / iPhoneDrop cu)...
 taskkill /im AdamDrop.exe /f >nul 2>&1
 taskkill /im iPhoneDrop.exe /f >nul 2>&1
 
+if exist "%CSC%" (
 echo [2/6] Bien dich (1 tep exe, toan bo trang web nhung ben trong)...
+)
 set "RES=/resource:web/index.html,web.index.html /resource:web/dashboard.html,web.dashboard.html /resource:web/qrcode.js,web.qrcode.js /resource:web/logo.png,web.logo.png /resource:web/logo-small.png,web.logo-small.png /resource:web/logo-small-2x.png,web.logo-small-2x.png /resource:web/logo-16.png,web.logo-16.png /resource:web/logo-20.png,web.logo-20.png /resource:web/logo-32.png,web.logo-32.png /resource:web/logo32.png,web.logo32.png /resource:web/logo-180.png,web.logo-180.png /resource:web/logo.ico,web.logo.ico /resource:web/adam-chan-dung.png,web.adam-chan-dung.png"
 rem Tep phim tat dung san chua MA KHOA nen khong phat hanh cong khai; co thi nhung, khong co thi bo qua
 if exist "web\AdamDrop.shortcut" set "RES=!RES! /resource:web\AdamDrop.shortcut,web.AdamDrop.shortcut"
 if exist "web\AdamDrop.auto.shortcut" set "RES=!RES! /resource:web\AdamDrop.auto.shortcut,web.AdamDrop.auto.shortcut"
 for %%F in (web\guide\*.png) do set "RES=!RES! /resource:%%F,web.guide.%%~nxF"
+if exist "%CSC%" (
 "%CSC%" /nologo /codepage:65001 /target:winexe /optimize+ /out:AdamDrop.exe /r:System.Windows.Forms.dll /r:System.Drawing.dll %RES% AdamDrop.cs
-if %errorlevel% neq 0 (
+if errorlevel 1 (
   echo [LOI] Bien dich that bai.
   pause
   exit /b 1
+)
+) else (
+echo [2/6] May nay khong co trinh bien dich - dung tep AdamDrop.exe dung san trong goi.
 )
 
 echo [3/6] Mo cong %PORT% cho chuong trinh...
