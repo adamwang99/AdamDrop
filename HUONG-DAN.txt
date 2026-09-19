@@ -1,0 +1,337 @@
+AdamDrop - gửi và nhận tệp giữa iPhone và máy tính Windows qua Wi-Fi (giống AirDrop)
+====================================================================================
+
+GỬI SANG IPHONE / SEND TO IPHONE
+  PC: Tổng quan (Overview) > mục Gửi sang iPhone (Send to iPhone) > Chọn tệp (Choose files), chọn nhiều tệp.
+  iPhone: quét QR ở Tổng quan (Overview) > Nhận từ PC (Receive from PC).
+  Lưu vào Tệp (Save to Files): tải bản gốc về vị trí Tải về của Safari, có thể là iCloud Drive.
+  Ảnh/video có thêm Lưu vào Ảnh (Save to Photos): bấm là ảnh/video mở NGAY TRONG TRANG,
+  rồi NHẤN GIỮ vào ảnh rồi chọn Lưu vào Ảnh (hoặc Thêm vào Ảnh). Với video: bấm nút
+  Chia sẻ của Safari rồi chọn Lưu video. AdamDrop không tự ghi vào thư viện Ảnh, Safari
+  luôn cần một lần chạm cuối của anh. Không lưu được thì dùng Lưu vào Tệp rồi chia sẻ
+  từ tệp đó. Khả năng xem/lưu phụ thuộc định dạng và iOS.
+  (Không mở ở tab mới: Safari trên iOS hay đẩy tệp vào Tệp khi mở tab mới.)
+
+  NHẬN ẢNH TỪ PC VÀO THƯ VIỆN ẢNH BẰNG 1 CHẠM (PHÍM TẮT) / ONE TAP INTO THE PHOTOS LIBRARY
+  Theo luật của Apple: trang web KHÔNG được ghi vào thư viện Ảnh, nên bấm Lưu vào Ảnh phải
+  nhấn giữ TỪNG ảnh. App Phím tắt là app hệ thống nên được phép ghi; dựng một lần rồi 1 chạm là
+  cả loạt ảnh vào thẳng Ảnh.
+  1. Trên iPhone: trang AdamDrop ▸ Nhận từ PC ▸ mục "⚡ Một chạm: lấy cả loạt ảnh vào thẳng thư
+     viện Ảnh (Phím tắt)" ▸ bấm "Sao chép địa chỉ danh sách" (đuôi /list?k=...).
+  2. App Phím tắt ▸ + ▸ đặt tên AdamDrop-nhan.
+  3. Thêm "Lấy nội dung của URL" ▸ dán địa chỉ ▸ để phương thức GET.
+  4. Thêm "Tách văn bản" ▸ Tách ▸ Dòng mới.
+  5. Thêm "Lặp lại với từng mục trong" ▸ chọn kết quả của Tách văn bản.
+  6. Trong vòng lặp: "Lấy nội dung của URL" ▸ để trống ô URL ▸ bấm vào ô đó ▸ chèn biến
+     "Lặp lại mục".
+  7. Vẫn trong vòng lặp: "Lưu vào Album ảnh" ▸ rồi "Kết thúc lặp lại".
+  Muốn lưu vào Tệp thay vì Ảnh thì đổi tác vụ cuối thành "Lưu vào Tệp".
+  Địa chỉ chứa mã khoá, đừng đưa cho người khác. Phím tắt cần app trên máy tính đang chạy.
+  (EN: copy the list address from the phone page, then Shortcuts ▸ new ▸ Get Contents of URL
+   (GET) ▸ Split Text by New Lines ▸ Repeat with Each ▸ Get Contents of URL with the Repeat Item
+   variable as the URL ▸ Save to Photo Album ▸ End Repeat. Swap the last action for Save to Files
+   to keep copies in Files instead.)
+  Bỏ chia sẻ (Remove) thu hồi một tệp; Dừng chia sẻ (Stop sharing) thu hồi tất cả,
+  kể cả các lượt tải còn đang chạy. Tệp gốc không bị xóa. Đóng app xóa hàng đợi.
+  Ai có mã QR/khóa hiện tại đều có thể tải những tệp đang chia sẻ trên cùng mạng.
+  Thu hồi không xóa những bản đã tải về. Chỉ chia sẻ tệp anh chủ động chọn.
+  HTTP Range hỗ trợ tua/tải từng phần; nếu tệp gốc thay đổi, hãy tải lại bản đầy đủ.
+  Trong app: bảng điều khiển ▸ tab Hướng dẫn ▸ mục:
+    Gửi từ máy tính sang iPhone
+    (tiếng Anh: Send from this PC to the iPhone)
+
+  EN: PC > Overview > Send to iPhone > Choose files (multiple selection). Scan the existing QR
+  in Overview > Receive from PC on iPhone. Save to Files uses Safari's configured
+  Downloads location, possibly iCloud Drive. Save to Photos opens the picture right in the
+  page: touch and hold it, then choose Save to Photos (Add to Photos). For video, tap
+  Safari's Share button, then Save Video. AdamDrop cannot save to the photo library by
+  itself and Safari always needs that last touch. If it will not save, use Save to Files
+  and share from the file. Format/iOS support varies. Save to Photos deliberately does NOT
+  open a new tab, because iOS Safari tends to put the file into Files instead.
+  Remove revokes one item; Stop sharing revokes all, including active downloads.
+  Originals are unchanged. Closing the app clears the queue. Existing downloaded
+  copies cannot be revoked. Anyone on the network with the key can download shared files.
+  Range supports partial transfers; download again if the source changes.
+
+Gói này gồm:
+  install.bat          - cài đặt (biên dịch, mở tường lửa, tự chạy cùng Windows)
+  uninstall.bat        - gỡ bỏ
+  AdamDrop.cs          - mã nguồn (C#, tự biên dịch bằng .NET có sẵn trong Windows)
+  web\index.html       - trang trao đổi tệp trên iPhone (gửi sang PC, nhận từ PC)
+  web\dashboard.html   - bảng điều khiển trên máy tính
+  web\qrcode.js        - thư viện vẽ mã QR (MIT, Kazuhiko Arase)
+  web\guide\*.png      - 8 ảnh hướng dẫn thật trên iPhone (có đánh số vị trí)
+  web\adam-chan-dung.png - ảnh chân dung ở tab Giới thiệu
+  docs\README-CHO-AGENT.md  - hướng dẫn cho trợ lý AI cài giúp
+
+Yêu cầu: Windows 10/11, quyền quản trị 1 lần lúc cài, iPhone và máy tính cùng Wi-Fi.
+Không cần cài Python, Node hay bất kỳ phần mềm nào khác. Sau khi cài chỉ có 1 tệp
+AdamDrop.exe (toàn bộ trang web đã nhúng bên trong).
+
+
+PHẦN A - CÀI TRÊN MÁY TÍNH (1 lần, ~1 phút)
+-------------------------------------------
+1. Giải nén, để cả thư mục AdamDrop ở nơi cố định (ví dụ Documents\AdamDrop).
+   Không xóa/di chuyển thư mục sau khi cài, vì mục khởi động trỏ vào đây.
+2. Bấm đúp install.bat -> Windows hỏi quyền quản trị -> chọn YES.
+3. Cửa sổ đen chạy 6 bước rồi tự mở bảng điều khiển (http://localhost:8765/dashboard).
+   Biểu tượng vàng xuất hiện ở khay hệ thống (góc phải Taskbar).
+4. Từ giờ AdamDrop tự chạy khi bật máy và mở sẵn cổng, không cần bấm gì.
+   Muốn xem lại bảng điều khiển: bấm đúp biểu tượng khay, hoặc mở
+   http://localhost:8765/dashboard (chỉ mở được từ chính máy tính đó).
+
+Mặc định tệp nhận được lưu vào thư mục Downloads. Sau mỗi đợt gửi có thông báo và tự
+mở thư mục (tắt được trong bảng điều khiển > Cài đặt).
+
+
+PHẦN B - CÁCH 1: GỬI QUA SAFARI (không cần cài gì trên iPhone)
+--------------------------------------------------------------
+1. Mở Camera trên iPhone, quét mã QR trong bảng điều khiển, bấm liên kết hiện ra.
+2. Bấm "Chọn ảnh & video", chọn xong là tự gửi. Có thanh tiến trình.
+3. Tệp được gửi theo từng đoạn 8 MB. Nếu Wi-Fi chập chờn hoặc bạn rời Safari:
+   mở lại trang và chọn đúng tệp đó, AdamDrop sẽ GỬI TIẾP từ chỗ dở (không gửi lại từ đầu).
+4. Lần sau: Safari -> Chia sẻ -> "Thêm vào MH chính" để mở bằng một chạm.
+
+
+PHẦN C - CÁCH 2: GỬI MỘT CHẠM TỪ BẢNG CHIA SẺ CỦA iPHONE
+-----------------------------------------------------------------
+Chỉ thiết lập một lần. Sau đó muốn gửi: chọn ảnh hoặc video trong Ảnh -> bấm Chia sẻ ->
+bấm "AdamDrop". Tệp đi thẳng sang máy tính, KHÔNG phải mở trang gửi nữa. (Giống AirDrop.)
+
+Tên mục trên màn hình (dùng đúng chữ này để tìm, hai nơi ghi GIỐNG NHAU).
+LƯU Ý: giao diện mặc định là TIẾNG ANH. Muốn đọc tiếng Việt thì bấm nút VI ở góc trên phải
+của bảng điều khiển, hoặc nút VI trên trang gửi. Tên mục theo từng thứ tiếng:
+  - Trang gửi trên iPhone:  ⚡ Gửi một chạm từ bảng Chia sẻ (như AirDrop)
+                             (tiếng Anh: ⚡ One-tap send from the Share Sheet (like AirDrop))
+  - Bảng điều khiển, tab "Hướng dẫn":  Gửi một chạm từ bảng Chia sẻ (như AirDrop)
+                             (tiếng Anh: One-tap send from the Share Sheet (like AirDrop))
+
+C1. Trên iPhone mở app Phím tắt (Shortcuts), chạy thử một phím tắt bất kỳ (lấy một cái
+    trong Phòng trưng bày cũng được). Rồi mở Cài đặt -> Phím tắt, bật công tắc chia sẻ:
+      - iOS cũ:  "Cho phép phím tắt không tin cậy" (Allow Untrusted Shortcuts)
+      - iOS 26 trở lên: Apple ĐỔI TÊN thành "Chia sẻ riêng tư" (Private Sharing).
+        Chỗ tìm: app Phím tắt -> bấm ảnh đại diện ở góc trên bên phải -> mục Cài đặt
+        của app. Nằm cùng chỗ với "Đồng bộ hóa iCloud" và "Nâng cao"; dòng chữ nhỏ bên
+        dưới ghi: "Cho phép nhận phím tắt trực tiếp từ những người trong danh bạ của
+        bạn." Trạng thái đúng là đang BẬT (màu xanh).
+        Mục "Nâng cao" KHÔNG liên quan: "Cho phép chạy tập lệnh" để nguyên TẮT
+        (chỉ dùng cho JavaScript/SSH). "Cho phép chia sẻ lượng dữ liệu lớn" nên BẬT
+        để gửi được video lớn.
+    Công tắc này chỉ hiện sau khi đã chạy ít nhất một phím tắt.
+
+    iOS 26 CHẶN HẲN TỆP PHÍM TẮT CHƯA XÁC NHẬN (đã thử trên máy anh ngày 18/09/2026):
+      - Bấm nút vàng -> iPhone báo: "Không thể nhập - URL phím tắt đã cung cấp không hợp lệ".
+      - Tải tệp về rồi bấm tệp trong Tệp ▸ Tải về -> iPhone báo: "Không thể mở phím tắt -
+        Việc nhập tệp phím tắt chưa xác nhận không được hỗ trợ."
+      => CẢ HAI NÚT ĐỀU KHÔNG DÙNG ĐƯỢC. Đây là quy định của Apple (tệp phím tắt phải do Apple
+         ký; tệp em tạo ra không ký được từ Windows), không phải anh thiếu công tắc nào.
+         Đừng mất thời gian bật/tắt công tắc chia sẻ nữa.
+      => ĐƯỜNG DUY NHẤT CHẮC CHẮN CHẠY: "CÁCH 2b" ngay dưới đây - tự dựng phím tắt bằng tay,
+         7 bước, không cần công tắc nào, làm một lần rồi dùng mãi.
+
+    KHÔNG TÌM THẤY CÔNG TẮC ĐÓ? Đừng mất thời gian tìm:
+      - Cứ thử bấm nút vàng ở C3 trước, nhiều máy thêm được luôn.
+      - Nếu iPhone chặn thì tự dựng phím tắt bằng tay theo "CÁCH 2b" ở cuối phần này.
+        Phím tắt do anh tự dựng trên chính máy mình LUÔN chạy được, không cần công tắc nào.
+
+C2. Trên máy tính: mở bảng điều khiển -> tab "Hướng dẫn" -> tìm mục có tên
+    "Gửi một chạm từ bảng Chia sẻ (như AirDrop)". Trong mục đó có mã QR nhỏ.
+    Dùng Camera trên iPhone quét mã QR đó.
+
+C3. Trang gửi mở ra trên iPhone. Trong mục "⚡ Gửi một chạm từ bảng Chia sẻ (như AirDrop)":
+    bấm nút vàng "Thêm AdamDrop bằng 1 chạm" (tiếng Anh: "Add AdamDrop in 1 tap"),
+    rồi bấm "Thêm phím tắt" (Add Shortcut).
+    Nút đó không chạy (Apple thỉnh thoảng chặn): bấm nút "Hoặc: tải tệp về"
+    (tiếng Anh: "Or: download the file"), rồi mở app Tệp -> Tải về -> bấm tệp
+    AdamDrop.shortcut -> bấm "Thêm phím tắt".
+
+C4. Mở app Phím tắt -> bấm phím tắt "AdamDrop" -> bấm nút (i) -> bật
+    "Hiển thị trong Bảng chia sẻ" (Show in Share Sheet).
+
+C5. Trong Ảnh: chọn ảnh/video -> Chia sẻ -> tìm "AdamDrop" ở hàng Phím tắt.
+    Chưa thấy thì bấm "Sửa tác vụ..." (Edit Actions) ở cuối bảng chia sẻ -> bật AdamDrop.
+    Lần đầu iPhone hỏi quyền: chọn "Luôn cho phép" và cho phép "Mạng cục bộ".
+
+C6. Muốn AdamDrop luôn nằm đầu bảng chia sẻ: Chia sẻ -> Sửa tác vụ -> nhấn giữ biểu
+    tượng ≡ kéo "AdamDrop" lên vị trí đầu -> Xong.
+
+LƯU Ý 1: Tệp phím tắt có chứa tên máy tính và mã khoá kết nối. Không đưa cho người khác.
+Nếu đổi mã khoá trong tab Cài đặt thì quét lại mã QR và thêm phím tắt một lần nữa.
+LƯU Ý 2: Bảng chia sẻ gửi mỗi tệp trong MỘT lần nên không gửi tiếp được khi đứt kết nối
+như đường Safari. Ảnh và video ngắn thì ổn; video rất dài nên dùng đường Safari (Phần B).
+LƯU Ý 3: Máy tính đang tắt hoặc khác mạng Wi-Fi thì bảng chia sẻ báo lỗi kết nối.
+LƯU Ý 4: Không thấy công tắc chia sẻ, hoặc muốn tự làm: xem CÁCH 2b ngay dưới đây.
+
+
+CÁCH 2b - TỰ DỰNG PHÍM TẮT BẰNG TAY (ĐƯỜNG CHÍNH trên iOS 26, 7 bước)
+-------------------------------------------------------------------
+Dùng khi iPhone không cho cài tệp phím tắt (không thấy "Chia sẻ riêng tư"), hoặc khi iPhone
+báo "Không thể nhập - URL phím tắt đã cung cấp không hợp lệ", hoặc khi anh muốn tự làm lấy. Phím tắt do anh tự tạo trên máy mình luôn được phép chạy.
+
+TRONG ỨNG DỤNG ĐÃ CÓ ẢNH CHỤP THẬT TỪNG BƯỚC: mở bảng điều khiển -> tab "Hướng dẫn" ->
+mục "Gửi một chạm từ bảng Chia sẻ (như AirDrop)" (hoặc mở trang gửi trên iPhone, mở khối
+"🛠️ ĐƯỜNG CHÍNH: Tự dựng phím tắt bằng tay"). Ở đó có 8 ảnh chụp màn hình thật: vòng tròn vàng
+khoanh đúng chỗ cần bấm, số trên ảnh khớp với số trong chú thích bên dưới ảnh.
+Ghi nhớ chữ trên máy: app gọi "hành động" là "TÁC VỤ" (ô "Tìm kiếm tác vụ").
+
+B1. Trên máy tính: mở bảng điều khiển -> tab "Hướng dẫn" -> mục "Gửi một chạm từ bảng Chia sẻ
+    (như AirDrop)". Trên iPhone quét mã QR trong mục đó, trang gửi mở ra. Kéo xuống cuối mục
+    "⚡ Gửi một chạm từ bảng Chia sẻ (như AirDrop)", ở đó có ô địa chỉ dài: bấm "Sao chép"
+    (Copy) để chép sẵn địa chỉ http://TÊN-MÁY.local:8765/upload?k=MÃKHÓA.
+
+B2. Mở app Phím tắt -> bấm nút + ở GÓC TRÊN BÊN PHẢI (cạnh chữ Sửa) -> màn hình "Phím tắt mới"
+    hiện ra -> bấm vào chữ "Phím tắt mới" ở trên cùng, đổi tên thành AdamDrop.
+
+B3. Bấm vào ô "Tìm kiếm tác vụ" ở khung dưới cùng (bàn phím hiện ra), gõ: Lap
+    -> chọn "Lặp với mỗi mục" (Repeat with Each).
+    Trong khung vòng lặp vừa hiện, bấm "+ Thêm tác vụ", lại bấm ô tìm kiếm, gõ: URL
+    -> chọn "Lấy nội dung của URL" (tiếng Anh: Get Contents of URL - KHÔNG phải "Nhận
+       nội dung", Apple tiếng Việt dùng chữ "Lấy") rồi khai:
+      - Địa chỉ: ô này thường đã dính sẵn biến xanh "URL"; bấm vào biến đó -> bấm dòng đỏ
+        "Xóa biến" cho ô trống -> giữ vào ô trống -> Dán địa chỉ đã chép ở B1
+      - Bấm vào chữ "GET" (dòng Phương thức) -> đổi thành "POST"
+      - Dòng "Yêu cầu nội dung" đang để "JSON": bấm vào chữ "JSON" -> chọn "Tệp" (File)
+      - Ô "Tệp" vừa hiện ra: bấm vào -> chọn biến "Lặp lại mục" (tiếng Anh: Repeat Item;
+        bản iOS khác ghi "Mục lặp lại", cùng một thứ)
+      - Nếu tác vụ rơi ra NGOÀI vòng lặp (nằm dưới "Kết thúc lặp lại"): giữ ~1 giây vào
+        tác vụ đó -> bấm "Di chuyển" -> đưa lên trên "Kết thúc lặp lại".
+      - App có thể tự thêm một tác vụ "Nhận ... từ Không nơi nào" ở đầu: bấm X để xoá.
+    Vòng lặp kết thúc ở đây, không thêm gì nữa.
+
+B4. Bấm nút (i) của phím tắt -> bật công tắc "Trong Bảng chia sẻ" (In Share Sheet) -> bấm
+    DẤU TÍCH ở góc phải trên để lưu.
+    iOS 26 KHÔNG có dòng chọn loại "Ảnh, Tệp, Phương tiện" như iOS cũ - đừng tìm.
+    Nếu bảng chia sẻ không hiện AdamDrop: quay lại phím tắt, bấm ô "Tìm kiếm tác vụ",
+    gõ: Nhan  -> chọn "Nhận" -> trong đó chọn loại là Ảnh + Phương tiện + Tệp.
+
+B5. Trong Ảnh: chọn ảnh/video -> Chia sẻ -> AdamDrop.
+    Lần đầu iPhone hỏi quyền: chọn "Luôn cho phép" và cho phép "Mạng cục bộ".
+
+LƯU Ý: nếu mỗi lần chỉ gửi MỘT ảnh thì bỏ được vòng lặp: phần thân chọn Tệp =
+"Đầu vào phím tắt" (Shortcut Input). Gửi nhiều ảnh một lúc thì phải có vòng lặp như B3.
+Kiểm tra nhanh: gửi xong, máy tính hiện tệp trong danh sách "Nhận gần đây" ở tab Tổng quan.
+
+
+PHẦN C2 - CÁCH 3: TỰ ĐỘNG HOÀN TOÀN (về tới Wi-Fi nhà là ảnh tự về máy tính)
+---------------------------------------------------------------------------------
+Dựng một lần, sau đó không phải bấm gì. Apple cho phép Tự động hoá chạy nền mà KHÔNG cần
+xác nhận với kích hoạt Wi-Fi và Giờ trong ngày, nên cách này chạy thật.
+
+Máy tính: app đã sẵn sàng, không phải làm gì thêm. Phím tắt tự động nằm sẵn trong app,
+mở được ở hai chỗ (dùng đúng chữ này để tìm, hai nơi ghi GIỐNG NHAU).
+Giao diện mặc định là TIẾNG ANH, tên mục theo từng thứ tiếng:
+  - Trang gửi trên iPhone:  🔁 Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)
+       (tiếng Anh: 🔁 Automatic: photos come home on their own (Wi-Fi))
+       (trong mục có nút vàng "Thêm phím tắt tự động bằng 1 chạm",
+        tiếng Anh: "Add the automatic shortcut in 1 tap")
+  - Bảng điều khiển, tab "Hướng dẫn":  Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)
+       (tiếng Anh: Automatic: photos come home on their own (Wi-Fi))
+       (trong mục có mã QR nhỏ)
+
+Trên iPhone (một lần, khoảng 5 phút):
+C2.1. Nếu chưa bật: mở app Phím tắt, chạy thử một phím tắt bất kỳ, rồi vào
+      Cài đặt -> Phím tắt -> bật "Cho phép phím tắt không tin cậy".
+
+C2.2. Cài phím tắt tự động, chọn một trong hai:
+      - Trên máy tính: mở bảng điều khiển -> tab "Hướng dẫn" -> mục
+        "Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)" -> dùng Camera trên iPhone
+        quét mã QR nhỏ trong mục đó.
+      - Trên iPhone: mở trang gửi AdamDrop -> mở mục
+        "🔁 Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)" -> bấm nút vàng
+        "Thêm phím tắt tự động bằng 1 chạm" (tiếng Anh: "Add the automatic shortcut in 1 tap").
+      App Phím tắt mở ra, bấm "Thêm phím tắt". Phím tắt có tên là AdamDrop-auto.
+      Nút 1 chạm không chạy thì bấm nút "Hoặc: tải tệp về" rồi mở Tệp -> Tải về.
+
+C2.3. Dựng Tự động hoá:
+      Mở app Phím tắt -> thẻ "Tự động hoá" -> bấm + -> chọn "Wi-Fi"
+      -> bấm "Chọn" và tích mạng Wi-Fi nhà (có cả 2.4G và 5G thì tích cả hai,
+        hoặc chọn "Mọi mạng" nếu muốn chạy với mọi Wi-Fi)
+      -> chọn "Chạy ngay" (tắt "Hỏi trước khi chạy") -> Tiếp
+      -> tìm "AdamDrop-auto" -> bấm vào -> Xong.
+
+C2.4. Lần chạy đầu, iPhone hỏi quyền thì cho phép "Mạng cục bộ" (chọn Luôn cho phép).
+
+C2.5. Thử: tắt Wi-Fi rồi bật lại. iPhone báo một thông báo, ảnh mới hiện trong danh sách
+      "Nhận gần đây" ở tab Tổng quan.
+
+Phím tắt tự động gửi những gì:
+  - Ảnh và video có NGÀY CHỤP là hôm nay, mới nhất trước.
+  - Tệp nào đã có trong thư mục lưu thì máy tính bỏ qua, không sinh bản (1) hay (2).
+    Nhờ vậy nối Wi-Fi nhiều lần trong ngày cũng không sinh tệp trùng.
+  - Vì mỗi lần chỉ gửi ảnh trong ngày, nên cho iPhone nối mạng đó ít nhất một lần mỗi ngày.
+    Hôm nào iPhone không về mạng nhà thì ảnh hôm đó không tự đi; muốn gửi bù thì mở trang
+    gửi (Phần B) hoặc dùng bảng chia sẻ (Phần C) cho những ảnh đó.
+
+Muốn đổi thành theo giờ (ví dụ 23:30 mỗi ngày): ở C2.3 chọn "Giờ trong ngày" thay vì "Wi-Fi",
+đặt 23:30 và lặp "Hàng ngày".
+
+LƯU Ý: tệp phím tắt tự động cũng chứa tên máy tính và mã khoá. Đổi mã khoá trong tab Cài đặt
+thì phải quét lại QR và thêm phím tắt một lần nữa.
+
+
+PHẦN D - BẢNG ĐIỀU KHIỂN (chỉ mở trên máy tính)
+-----------------------------------------------
+Mở: bấm đúp biểu tượng khay, hoặc http://localhost:8765/dashboard
+
+Ngôn ngữ: mặc định là TIẾNG ANH; bấm nút EN / VI ở góc trên phải để đổi. Lựa chọn
+được nhớ cho trình duyệt đó, và cũng được lưu vào adamdrop.ini (dòng lang=) để menu
+khay và bong bóng thông báo dùng cùng ngôn ngữ.
+
+Có 6 thẻ:
+- Tổng quan : mã QR là trung tâm, khối QR nhỏ gọn nằm giữa khung; cả tab nằm gọn trong một
+              màn hình nên không phải cuộn, mã QR co giãn theo chiều cao cửa sổ. Có lần chia
+              sẻ gần nhất (số tệp, dung lượng, thời lượng, tốc độ cao nhất / thấp nhất /
+              trung bình), số liệu hôm nay / 7 ngày / tổng cộng, và danh sách "Nhận gần đây"
+              giữ qua các lần khởi động (lưu trong recent.tsv). Bấm vào tên tệp để mở tệp.
+- Lịch sử   : một thẻ, hai phần, đổi nhau bằng công tắc "Lượt nhận | Nhật ký":
+                + Lượt nhận: từng đợt chia sẻ (giờ, số tệp, dung lượng, thời lượng, tốc độ),
+                  lọc theo ngày; lưu bền trong history.tsv (giữ 2000 đợt) nên tắt máy không mất.
+                + Nhật ký   : 200 dòng gần nhất của ứng dụng, kèm nút mở tệp log.
+- Kết nối   : phiên đang nhận (tên tệp, %, tốc độ, nguồn) và nút Huỷ; danh sách tệp gửi
+              dở (giữ 24 giờ để gửi tiếp, xoá được).
+- Hướng dẫn : hướng dẫn sử dụng đầy đủ, chia 10 mục: cách gửi bằng Safari (có gửi tiếp),
+              gửi một chạm từ bảng chia sẻ, tự động khi nối Wi-Fi, chỗ lưu tệp và cách đổi,
+              biểu tượng ở khay, tốc độ thực tế, khi có trục trặc, an toàn riêng tư, các tệp
+              ứng dụng giữ lại.
+- Giới thiệu: thông tin ứng dụng, người đứng sau kênh (Adam Wang), cách làm ra,
+              và đường dẫn các tệp cấu hình.
+- Cài đặt   : chọn thư mục nhận tệp (mở hộp thoại của Windows), đổi mã khoá,
+              tự mở thư mục, ngăn máy ngủ khi đang nhận, chạy cùng Windows.
+
+
+PHẦN E - BẢO MẬT & CẤU HÌNH
+----------------------------
+- Liên kết chứa mã khóa riêng (dòng key= trong adamdrop.ini). Không có mã thì không gửi
+  được tệp vào máy. Cổng 8765 được mở cho cả mạng riêng tư lẫn mạng công cộng.
+- Mạng công cộng: bảng điều khiển hiện cảnh báo vàng. Khi đó chỉ ai có đúng mã khoá mới
+  gửi được tệp; sai 20 lần trong 1 phút thì thiết bị đó bị tạm khoá 1 phút.
+- Đổi thư mục lưu: bảng điều khiển > Cài đặt > Chọn thư mục (hoặc chuột phải biểu tượng
+  khay > Đổi thư mục nhận tệp...). Đổi mã khóa: bảng điều khiển > Cài đặt > Đổi mã khoá
+  (sau đó phải quét lại QR và sửa địa chỉ trong Phím tắt).
+- File trùng tên được tự thêm (1), (2)... không ghi đè. Tệp đang nhận dở nằm ở dạng
+  .adamdrop.part và không bao giờ mang tên thật, nên không lẫn với tệp đã nhận xong.
+- Cấu hình được ghi kiểu an toàn (ghi tạm rồi thay thế, giữ bản adamdrop.ini.bak).
+
+
+PHẦN F - XỬ LÝ SỰ CỐ
+--------------------
+- iPhone báo "Không thể kết nối tới máy chủ": kiểm tra cùng Wi-Fi (không phải 4G hay
+  Wi-Fi khách). Vào Cài đặt -> Quyền riêng tư & Bảo mật -> Mạng cục bộ -> bật Phím tắt.
+  Nếu tên TÊN-MÁY.local không tới được, mở bảng điều khiển, bấm nút địa chỉ IP bên dưới
+  mã QR và dùng địa chỉ đó trong Phím tắt.
+- Bị hỏi đi hỏi lại khi gửi nhiều file: Cài đặt -> Ứng dụng -> Phím tắt -> Nâng cao
+  -> bật "Cho phép chia sẻ lượng lớn dữ liệu".
+- File trên máy tính có đuôi .bin hoặc 0 byte: mục "Tệp" ở LƯU Ý 4 (phần C) chưa chọn đúng
+  "Lặp lại mục", hoặc còn sót nhãn biến trong ô địa chỉ.
+- Gửi nửa chừng thì dừng: mở lại trang Safari và chọn đúng tệp đó để gửi tiếp; hoặc vào
+  bảng điều khiển > Kết nối để xem tệp gửi dở.
+- Ổ đĩa gần đầy: máy tính báo bong bóng "Ổ đĩa hết chỗ trống" và ghi vào nhật ký; điện
+  thoại có thể chỉ báo lỗi kết nối (đây là giới hạn của Windows khi phải trả lời trước
+  khi nhận hết tệp). Hãy giải phóng dung lượng rồi gửi lại; tệp vẫn còn trong Ảnh.
+- Bảng điều khiển không mở / lỗi "Không mở được cổng": chạy lại install.bat với quyền
+  quản trị.
+- Không thấy biểu tượng vàng ở khay: Windows 11 xếp biểu tượng mới vào khay ẩn. Bấm mũi
+  tên ^ cạnh đồng hồ để thấy, rồi kéo biểu tượng AdamDrop ra ngoài nếu muốn luôn hiện.
+- Video dài: giữ iPhone sáng màn hình cho tới khi xong.
+
+Gỡ bỏ: chạy uninstall.bat rồi xóa thư mục.

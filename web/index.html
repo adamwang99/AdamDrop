@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AdamDrop">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>AdamDrop</title>
+<link rel="icon" href="/logo-small.png">
+<link rel="apple-touch-icon" href="/logo-small.png">
+<style>
+  :root {
+    --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --sub: #6e6e73;
+    --accent: #c98a15; --accent2: #0a84ff; --ok: #30b95a; --err: #ff453a; --line: #e5e5ea; --track: #e5e5ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0b0b0d; --card: #1c1c1e; --text: #f2efe6; --sub: #98989f; --line: #2c2c2e; --track: #3a3a3c; }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 32px); max-width: 560px; margin: 0 auto; }
+  header { text-align: center; margin: 12px 0 22px; position: relative; }
+  .applogo { width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 12px; display: block;
+    background: #111; border: 1px solid rgba(216,155,43,.4); box-shadow: 0 8px 22px rgba(216,155,43,.30); }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
+  .sub { color: var(--sub); font-size: 14px; }
+  .lang { position: absolute; right: 0; top: 0; display: flex; gap: 2px; padding: 2px; border-radius: 999px; border: 1px solid var(--line); }
+  .lang button { border: 0; background: transparent; color: var(--sub); font: inherit; font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
+  .lang button.on { background: var(--accent); color: #14110a; }
+  .pick { display: block; width: 100%; border: 0; border-radius: 16px; background: linear-gradient(140deg, #e9b452, #d89b2b); color: #14110a;
+    font-size: 18px; font-weight: 700; padding: 18px; text-align: center; cursor: pointer; box-shadow: 0 8px 20px rgba(216,155,43,.28); }
+  .pick:active { opacity: .85; }
+  .pick.secondary { background: var(--card); color: var(--accent); margin-top: 10px; font-size: 16px; padding: 14px; box-shadow: none; border: 1px solid var(--line); }
+  .pick[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+  input[type=file] { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-top: 16px; }
+  .overall { display: none; }
+  .overall .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 15px; font-weight: 600; }
+  .overall .row span:last-child { color: var(--sub); font-weight: 500; font-size: 13px; white-space: nowrap; }
+  .bar { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; margin-top: 10px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 4px; transition: width .15s linear; }
+  .bar.done i { background: var(--ok); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  li:first-child { border-top: 0; }
+  li .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li .s { color: var(--sub); font-size: 12px; white-space: nowrap; }
+  li .st { width: 22px; text-align: center; font-weight: 700; }
+  li.ok .st { color: var(--ok); } li.err .st { color: var(--err); } li.run .st { color: var(--accent); }
+  li .note { display: block; color: var(--accent); font-size: 11px; }
+  .tip { font-size: 13px; color: var(--sub); line-height: 1.5; }
+  .tip b { color: var(--text); }
+  .tip a { color: var(--accent); word-break: break-all; }
+  #list:empty { display: none; }
+  details summary { font-weight: 600; font-size: 15px; cursor: pointer; color: var(--accent); list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details ol { padding-left: 20px; margin: 12px 0 0; font-size: 14px; line-height: 1.6; color: var(--text); }
+  details ol li { display: list-item; border: 0; padding: 3px 0; font-size: 14px; }
+  .copy { display: flex; gap: 8px; margin: 8px 0 4px; }
+  .copy input { flex: 1; min-width: 0; font: 12px ui-monospace, Menlo, monospace; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .copy button { border: 0; border-radius: 10px; background: var(--accent); color: #14110a; font-size: 14px; font-weight: 700; padding: 0 14px; }
+  a.dl { display: block; text-align: center; text-decoration: none; background: var(--accent); color: #14110a; font-size: 15px; font-weight: 700; padding: 12px; border-radius: 12px; }
+  a.dl2 { background: transparent; color: var(--accent); border: 1px solid rgba(216,155,43,.55); font-weight: 600; font-size: 14px; padding: 10px; }
+  .mini { color: var(--sub); font-size: 12px; margin-top: 6px; line-height: 1.45; }
+  .modes { display:flex;gap:8px;margin-bottom:20px; }
+  .modes button {flex:1;padding:12px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);font:inherit;font-size:14px;}
+  .modes button.on {border-color:var(--accent);background:var(--accent);color:#14110a;font-weight:700;}
+  .receive-file {padding:16px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere;}
+  .receive-actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .receive-actions a {flex:1;min-width:120px;}
+  .gimg { display: block; width: 100%; margin: 8px 0 0; border-radius: 9px; border: 1px solid var(--line); }
+  .rctl { display: flex; gap: 8px; flex-wrap: wrap; }
+  .rctl .pick { flex: 1; min-width: 140px; }
+  /* Khung xem anh/video ngay trong trang: de nguoi dung NHAN GIU vao anh -> Luu vao Anh.
+     Mo o tab moi thi Safari tren iOS de day tep vao Tep (nhat la khi phan hoi co CSP sandbox). */
+  #viewer { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; padding: 14px; }
+  #viewer[hidden] { display: none; }
+  .vbox { width: 100%; max-width: 620px; max-height: 100%; overflow: auto; background: var(--card); border-radius: 16px; padding: 14px; }
+  .vhead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .vhead strong { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 15px; }
+  .vhead button { border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 10px; padding: 8px 14px; font: inherit; font-size: 13px; }
+  #vBody img, #vBody video { display: block; width: 100%; height: auto; max-height: 62vh; object-fit: contain; border-radius: 10px; background: #000; }
+  #viewer .tip { margin: 10px 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="lang">
+    <button id="langEn" data-lang="en">EN</button>
+    <button id="langVi" data-lang="vi">VI</button>
+  </div>
+  <img class="applogo" src="/logo-small.png" alt="AdamDrop">
+  <h1 id="h1"></h1>
+  <div class="sub" id="status"></div>
+</header>
+
+<nav class="modes"><button id="modeSend" type="button"></button><button id="modeReceive" type="button"></button></nav>
+<section id="receivePane" hidden><h2 id="receiveTitle"></h2><div class="rctl"><button class="pick secondary" id="refreshShares"></button><button class="pick secondary" id="saveAllFiles"></button></div><p id="receiveStatus" class="tip" role="status"></p><div id="receiveQueue"></div><p id="photosHelp" class="tip"></p>
+  <details id="rcvSc"><summary id="rcvScSummary"></summary><ol id="rcvScSteps"></ol></details>
+</section>
+<div id="viewer" hidden role="dialog" aria-modal="true">
+  <div class="vbox">
+    <div class="vhead"><strong id="vTitle"></strong><button type="button" id="vClose"></button></div>
+    <div id="vBody"></div>
+    <p class="tip" id="vHelp"></p>
+    <a class="dl dl2" id="vOpen" target="_blank" rel="noopener noreferrer"></a>
+  </div>
+</div>
+<section id="sendPane">
+<label class="pick" id="pickPhotos" for="filePhotos"></label>
+<input type="file" id="filePhotos" accept="image/*,video/*" multiple>
+<label class="pick secondary" id="pickFiles" for="fileAny"></label>
+<input type="file" id="fileAny" multiple>
+
+<div class="card overall" id="overall">
+  <div class="row"><span id="ovText"></span><span id="ovSub"></span></div>
+  <div class="bar" id="ovBar"><i></i></div>
+</div>
+
+<div class="card" id="listCard" style="display:none"><ul id="list"></ul></div>
+
+<div class="card">
+  <details id="sc">
+    <summary id="scSummary"></summary>
+    <ol id="scSteps"></ol>
+  </details>
+  <details id="auto">
+    <summary id="autoSummary"></summary>
+    <ol id="autoSteps"></ol>
+  </details>
+</div>
+
+<div class="card tip" id="tip"></div>
+
+</section>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var KEY = params.get('k') || '';
+  var HOST = '{{HOST}}', PORT = '{{PORT}}', PC = '{{PCNAME}}';
+  var SCFILE = {{SCFILE}} === true, AUTOFILE = {{AUTOFILE}} === true;
+  var $ = function (id) { return document.getElementById(id); };
+  var CHUNK = 8 * 1024 * 1024;
+  var queue = [], running = false, doneBytes = 0, totalBytes = 0, doneCount = 0, failCount = 0, batchCount = 0, startedAt = 0;
+  var lang = 'en';
+
+  var DICT = {
+    en: {
+      title: 'Send to the PC',
+      h1: 'Send to {pc}',
+      idle: 'Pick photos or videos and they go straight to the PC',
+      pickPhotos: 'Choose photos & videos',
+      pickFiles: 'Choose other files (keeps the original)',
+      sending: 'Sending {i}/{n}…',
+      doneOk: 'Sent {n} file(s) ✓',
+      doneSome: 'Done {ok} file(s), {bad} failed',
+      statusOk: 'The files are in the receive folder on the PC',
+      statusSome: 'Tap a failed file again to resume it from where it stopped',
+      resume: 'resuming from {size}',
+      fileWord: 'file',
+      tip: '<b>Tip:</b> keep the iPhone screen on and stay in Safari until it finishes. If the network drops, tap the same file again: the PC <b>continues from the last byte</b> instead of starting over. In the photo picker tap <b>Options</b> ▸ <b>Current</b> if you want the original format (HEIC/HEVC).',
+      tipHome: '<br><b>Use it like AirDrop:</b> tap Safari Share ▸ <b>Add to Home Screen</b>, then open it with one tap next time.',
+      tipStable: '<br><b>Use it like AirDrop:</b> open <a></a> and tap Share ▸ <b>Add to Home Screen</b>. This address keeps working even when the PC gets a new IP.',
+      aStable: 'this fixed address',
+      scSummary: '⚡ One-tap send from the Share Sheet (like AirDrop) — set up once, keep forever',
+      scSheet: 'Add to iPhone Share Sheet',
+      scSheetNote: 'Open this page on the <b>iPhone</b>. Both buttons below carry this PC name and the key, so there is nothing to type. The key never leaves your own network.',
+      scImport: 'Add AdamDrop in 1 tap',
+      scSheet: 'Or: download the file',
+      scImportNote: 'On <b>iOS 26</b> Apple refuses unsigned shortcut files, so those two buttons often answer <b>“Cannot Open Shortcut — Importing unsigned shortcut files is not supported”</b>. If you see that, skip them and use the <b>build-it-by-hand steps right below</b> — those always work.',
+      scNoFile: 'This build does not include the ready-made shortcut file — that file carries your key, so the public build never ships it. Use the build-it-by-hand steps below: a minute of work, and they work on every iPhone.',
+      autoNoFile: 'This build does not include the ready-made automatic shortcut file. Build it by hand with the steps below.',
+      sc1: 'In the <b>Shortcuts</b> app, run any shortcut once (a Gallery one is fine), then turn on the sharing switch in <b>Settings ▸ Shortcuts</b>: older iOS calls it <b>Allow Untrusted Shortcuts</b>, iOS 26 renamed it <b>Private Sharing</b> (Shortcuts app ▸ Settings, profile icon top right). It only appears after a shortcut has run once and must be on. Cannot find it? You do not need it — build the shortcut by hand, see the note under the buttons.',
+      sc2: 'Tap <b>Add AdamDrop in 1 tap</b> ▸ the Shortcuts app opens ▸ tap <b>Add Shortcut</b> (Apple may ask twice). If nothing opens, use the second button instead.',
+      sc3: 'Second button: open <b>Files ▸ Downloads</b>, tap <b>AdamDrop.shortcut</b>, then tap <b>Add Shortcut</b>.',
+      sc4: 'Open <b>Shortcuts ▸ AdamDrop ▸ ⓘ</b> and turn on <b>Show in Share Sheet</b>.',
+      sc5: 'Done. In Photos: pick items ▸ <b>Share</b> ▸ <b>AdamDrop</b>. The first time iOS asks twice: choose <b>Always Allow</b> and allow <b>Local Network</b>.',
+      sc6: 'Want it at the top of the list? In the share sheet tap <b>Edit Actions…</b> and drag AdamDrop up.',
+      scResult: '🖼️ A correct shortcut: method <b>POST</b>, Request Body <b>File</b> (the File field holds the variable <b>Repeat Item</b>), <b>End Repeat</b> at the bottom.',
+      scResult: '🖼️ Phím tắt đúng: Phương thức <b>POST</b>, Yêu cầu nội dung <b>Tệp</b> (ô Tệp là biến <b>Lặp lại mục</b>), <b>Kết thúc lặp lại</b> ở dưới cùng.',
+      scManual: 'Only if you prefer to build the shortcut by hand, use this address:',
+      scHandTitle: '🛠️ MAIN PATH: Build the shortcut by hand (7 steps, always works)',
+      scHand: '<li>Turn the sharing switch on (once): open the <b>Shortcuts</b> app &rsaquo; tap your <b>picture in the top right corner</b> &rsaquo; <b>Settings</b> &rsaquo; the <b>Private Sharing</b> switch ① must be <b>ON</b> (older iOS calls it "Allow Untrusted Shortcuts").<img class="gimg" src="/guide/buoc1-cong-tac.png" alt="Private Sharing switch on"></li><li>Tap the <b>+</b> in the <b>top right corner</b> (never the small + next to a folder name: that only creates an empty folder) and name the shortcut <b>AdamDrop</b>. Then tap the <b>action search box</b> ①, type <span class="k">Repeat</span> and pick <b>Repeat with Each</b>.<img class="gimg" src="/guide/buoc2-tim-kiem.png" alt="Action search box"></li><li>Let the loop read the photos you send: leave the loop line ① alone, tap the <b>blue "Item" chip</b> ② &rsaquo; pick the variable <b>Shortcut Input</b> (5th line in the variable list).<img class="gimg" src="/guide/buoc3-vong-lap.png" alt="Repeat loop and Item variable"></li><li>Tap <b>+</b> to add an action, type <span class="k">URL</span> and pick the row <b>Get Contents of URL</b> ①. If it lands outside the loop: hold it about a second &rsaquo; <b>Move</b> &rsaquo; put it above the "End Repeat" line.<img class="gimg" src="/guide/buoc4-lay-noi-dung.png" alt="Get Contents of URL row"></li><li>On the <b>Method</b> row tap <b>GET</b>, then choose <b>POST</b> ① in the list that appears.<img class="gimg" src="/guide/buoc5-post.png" alt="Choose POST"></li><li>The <b>URL</b> field usually already holds a <b>blue variable named "URL"</b> ① &mdash; tap that variable &rsaquo; tap the red <b>Delete Variable</b> to empty the field &rsaquo; hold the empty field &rsaquo; <b>Paste</b> the address from the box at the end of this section. On the <b>Request Body</b> row ② tap <b>JSON</b> &rsaquo; choose <b>File</b>. Tap the <b>File</b> field ③ &rsaquo; pick the variable <b>Repeat Item</b>.<img class="gimg" src="/guide/buoc6-tep.png" alt="Request Body File, Repeat Item, address"></li><li>Tap the <b>&#9432;</b> button in the bottom bar &rsaquo; turn on the <b>In Share Sheet</b> switch ① &rsaquo; tap the <b>tick</b> in the top right to save. Then open <b>Photos</b> &rsaquo; pick a photo &rsaquo; <b>Share</b> &rsaquo; <b>AdamDrop</b> (the first time choose <b>Always Allow</b> and allow <b>Local Network</b>).<img class="gimg" src="/guide/buoc7-bang-chia-se.png" alt="In Share Sheet switch"></li>',
+      autoSummary: '🔁 Automatic: photos come home on their own (Wi-Fi)',
+      autoNote: 'Install this second shortcut and set one automation on the iPhone. After that, every time the iPhone joins your home Wi-Fi, the day\'s new photos and videos go to this PC with nothing to tap. Files that already arrived are skipped, so you never end up with copies named (1) or (2).',
+      autoBtn: 'Add the automatic shortcut in 1 tap',
+      autoBtn2: 'Or: download the file',
+      auto1: 'Tap the first button ▸ the Shortcuts app opens ▸ tap <b>Add Shortcut</b>. (Same one-time sharing setting as above: Settings ▸ Shortcuts, called Allow Untrusted Shortcuts on older iOS and Private Sharing on iOS 26.)',
+      auto2: 'Open the <b>Shortcuts</b> app ▸ tab <b>Automation</b> ▸ <b>+</b> ▸ choose <b>Wi-Fi</b>.',
+      auto3: 'Tap <b>Choose</b> and tick your home network (tick both 2.4G and 5G if you have them, or choose <b>Any Network</b>).',
+      auto4: 'Pick <b>Run Immediately</b> (turn OFF “Ask Before Running”) ▸ <b>Next</b>.',
+      auto5: 'Search for <b>AdamDrop-auto</b> ▸ tap it ▸ <b>Done</b>. On the first run allow <b>Local Network</b>.',
+      auto6: 'Test: turn Wi-Fi off and back on. You get a notification, and the new photos appear on the PC (folder shown in Settings).',
+      copy: 'Copy', copied: 'Copied ✓'
+    },
+    vi: {
+      title: 'Gửi sang PC',
+      h1: 'Gửi sang {pc}',
+      idle: 'Chọn ảnh hoặc video để gửi thẳng vào máy tính',
+      pickPhotos: 'Chọn ảnh & video',
+      pickFiles: 'Chọn tệp khác (giữ nguyên bản gốc)',
+      sending: 'Đang gửi {i}/{n}…',
+      doneOk: 'Đã gửi xong {n} tệp ✓',
+      doneSome: 'Xong {ok} tệp, lỗi {bad} tệp',
+      statusOk: 'Tệp đã nằm trong thư mục nhận trên máy tính',
+      statusSome: 'Tệp lỗi: bấm lại vào tệp đó để gửi tiếp từ chỗ dở',
+      resume: 'tiếp tục từ {size}',
+      fileWord: 'tệp',
+      tip: '<b>Mẹo:</b> giữ màn hình iPhone sáng và không rời Safari cho tới khi gửi xong. Nếu mạng đứt giữa chừng, bấm lại vào tệp đó: máy tính sẽ <b>gửi tiếp từ chỗ dở</b>, không phải gửi lại từ đầu. Trong bảng chọn ảnh, bấm <b>Tùy chọn</b> ▸ <b>Hiện tại</b> nếu muốn giữ định dạng gốc (HEIC/HEVC).',
+      tipHome: '<br><b>Dùng như AirDrop:</b> bấm nút Chia sẻ của Safari ▸ <b>Thêm vào MH chính</b> để lần sau mở bằng một chạm.',
+      tipStable: '<br><b>Dùng như AirDrop:</b> mở <a></a> rồi bấm Chia sẻ ▸ <b>Thêm vào MH chính</b>. Địa chỉ này không đổi khi máy tính đổi IP.',
+      aStable: 'địa chỉ cố định này',
+      scSummary: '⚡ Gửi một chạm từ bảng Chia sẻ (như AirDrop) — dựng 1 lần, dùng mãi',
+      scSheet: 'Thêm vào bảng Chia sẻ iPhone',
+      scSheetNote: 'Mở trang này trên <b>iPhone</b>. Hai nút dưới đây đã mang sẵn tên máy tính và mã khoá, anh không phải gõ gì. Mã khoá chỉ đi trong mạng nhà, không ra ngoài.',
+      scImport: 'Thêm AdamDrop bằng 1 chạm',
+      scSheet: 'Hoặc: tải tệp về',
+      scImportNote: 'Trên <b>iOS 26</b> Apple chặn hẳn tệp phím tắt chưa xác nhận, nên hai nút trên thường báo <b>“Không thể mở phím tắt — Việc nhập tệp phím tắt chưa xác nhận không được hỗ trợ”</b>. Gặp câu đó thì bỏ qua hai nút, dùng <b>cách dựng bằng tay ngay bên dưới</b> — luôn chạy.',
+      scNoFile: 'Bản này không kèm tệp phím tắt dựng sẵn — tệp đó chứa mã khoá nên bản công khai không phát hành. Anh dùng cách dựng bằng tay ngay bên dưới: một phút là xong và chạy được trên mọi iPhone.',
+      autoNoFile: 'Bản này không kèm tệp phím tắt tự động dựng sẵn. Anh dựng bằng tay theo các bước bên dưới.',
+      sc1: 'Mở app <b>Phím tắt</b>, chạy thử một phím tắt bất kỳ (lấy trong Phòng trưng bày cũng được), rồi bật công tắc chia sẻ ở <b>Cài đặt ▸ Phím tắt</b>: iOS cũ gọi là <b>Cho phép phím tắt không tin cậy</b>, iOS 26 đổi tên thành <b>Chia sẻ riêng tư</b> (Private Sharing), nằm trong Cài đặt của app Phím tắt (ảnh đại diện góc trên phải). Công tắc chỉ hiện sau khi đã chạy một phím tắt và phải đang BẬT. Không thấy? Không cần nó, xem ghi chú dưới hai nút.',
+      sc2: 'Bấm <b>Thêm AdamDrop bằng 1 chạm</b> ▸ app Phím tắt mở ra ▸ bấm <b>Thêm phím tắt</b> (Apple có thể hỏi 2 lần). Nút không chạy thì dùng nút thứ hai.',
+      sc3: 'Nút thứ hai: mở <b>Tệp ▸ Tải về</b>, bấm tệp <b>AdamDrop.shortcut</b>, rồi bấm <b>Thêm phím tắt</b>. Nếu bấm tệp mà iPhone báo lỗi nhập thì dùng cách tự dựng bằng tay ở cuối mục.',
+      sc4: 'Mở <b>Phím tắt ▸ AdamDrop ▸ ⓘ</b> và bật <b>Hiển thị trong Bảng chia sẻ</b>.',
+      sc5: 'Xong. Trong Ảnh: chọn ảnh/video ▸ <b>Chia sẻ</b> ▸ <b>AdamDrop</b>. Lần đầu iPhone hỏi 2 câu: chọn <b>Luôn cho phép</b> và cho phép <b>Mạng cục bộ</b>.',
+      sc6: 'Muốn nó nằm đầu danh sách: trong bảng Chia sẻ bấm <b>Sửa tác vụ…</b> rồi kéo AdamDrop lên trên.',
+      scManual: 'Chỉ khi anh muốn tự làm phím tắt bằng tay, địa chỉ dùng để dán là:',
+      scHandTitle: '🛠️ ĐƯỜNG CHÍNH: Tự dựng phím tắt bằng tay (7 bước, luôn chạy được)',
+      scHand: '<li>Bật công tắc chia sẻ (làm một lần): mở app <b>Phím tắt</b> &rsaquo; bấm <b>ảnh đại diện ở góc trên bên phải</b> &rsaquo; <b>Cài đặt</b> &rsaquo; công tắc <b>Chia sẻ riêng tư</b> ① phải đang <b>BẬT</b> (iOS cũ gọi là "Cho phép phím tắt không tin cậy").<img class="gimg" src="/guide/buoc1-cong-tac.png" alt="Công tắc Chia sẻ riêng tư đang bật"></li><li>Bấm nút <b>+</b> ở <b>góc trên bên phải</b> (đừng bấm dấu + nhỏ cạnh tên thư mục: chỗ đó chỉ tạo ra thư mục rỗng), đặt tên phím tắt là <b>AdamDrop</b>. Rồi bấm vào <b>ô tìm kiếm tác vụ</b> ①, gõ <span class="k">Lap</span> và chọn <b>Lặp lại với mỗi mục</b>.<img class="gimg" src="/guide/buoc2-tim-kiem.png" alt="Ô tìm kiếm tác vụ"></li><li>Cho vòng lặp đọc ảnh anh gửi: dòng vòng lặp ① giữ nguyên, bấm vào <b>ô xanh "Mục"</b> ② &rsaquo; chọn biến <b>Đầu vào phím tắt</b> (dòng thứ 5 trong danh sách biến).<img class="gimg" src="/guide/buoc3-vong-lap.png" alt="Vòng lặp và ô biến Mục"></li><li>Bấm <b>+</b> để thêm tác vụ, gõ <span class="k">Url</span> rồi chọn đúng dòng <b>Lấy nội dung của URL</b> ①. Nếu nó rơi ra ngoài vòng lặp: giữ ~1 giây vào tác vụ &rsaquo; <b>Di chuyển</b> &rsaquo; đưa lên trên dòng "Kết thúc lặp lại".<img class="gimg" src="/guide/buoc4-lay-noi-dung.png" alt="Dòng Lấy nội dung của URL"></li><li>Ở dòng <b>Phương thức</b> bấm chữ <b>GET</b>, rồi chọn <b>POST</b> ① trong bảng vừa hiện ra.<img class="gimg" src="/guide/buoc5-post.png" alt="Chọn POST"></li><li>Dòng <b>URL</b>: trong ô thường đã dính sẵn <b>biến xanh tên "URL"</b> ① &mdash; bấm vào biến đó &rsaquo; bấm dòng đỏ <b>Xóa biến</b> cho ô trống &rsaquo; giữ vào ô trống &rsaquo; <b>Dán</b> địa chỉ ở ô cuối mục này. Dòng <b>Yêu cầu nội dung</b> ②: bấm chữ <b>JSON</b> &rsaquo; chọn <b>Tệp</b>. Bấm vào ô <b>Tệp</b> ③ &rsaquo; chọn biến <b>Lặp lại mục</b>.<img class="gimg" src="/guide/buoc6-tep.png" alt="Yêu cầu nội dung Tệp, Lặp lại mục, địa chỉ"></li><li>Bấm nút <b>&#9432;</b> ở thanh dưới cùng &rsaquo; bật công tắc <b>Trong Bảng chia sẻ</b> ① &rsaquo; bấm <b>dấu tích</b> ở góc phải trên để lưu. Xong rồi mở <b>Ảnh</b> &rsaquo; chọn ảnh &rsaquo; <b>Chia sẻ</b> &rsaquo; <b>AdamDrop</b> (lần đầu chọn <b>Luôn cho phép</b> và cho phép <b>Mạng cục bộ</b>).<img class="gimg" src="/guide/buoc7-bang-chia-se.png" alt="Công tắc Trong Bảng chia sẻ"></li>',
+      autoSummary: '🔁 Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)',
+      autoNote: 'Cài thêm phím tắt thứ hai này và dựng một Tự động hoá trên iPhone. Sau đó, mỗi lần iPhone nối Wi-Fi nhà, ảnh và video mới trong ngày tự về máy tính, không phải bấm gì. Tệp đã nhận trước đó sẽ được bỏ qua, nên anh không bị các bản trùng tên kiểu (1) hay (2).',
+      autoBtn: 'Thêm phím tắt tự động bằng 1 chạm',
+      autoBtn2: 'Hoặc: tải tệp về',
+      auto1: 'Bấm nút đầu ▸ app Phím tắt mở ra ▸ bấm <b>Thêm phím tắt</b>. (Vẫn cần bật một lần như trên: Cài đặt ▸ Phím tắt, iOS cũ gọi là Cho phép phím tắt không tin cậy, iOS 26 gọi là Chia sẻ riêng tư.)',
+      auto2: 'Mở app <b>Phím tắt</b> ▸ thẻ <b>Tự động hoá</b> ▸ bấm <b>+</b> ▸ chọn <b>Wi-Fi</b>.',
+      auto3: 'Bấm <b>Chọn</b> và tích mạng Wi-Fi nhà (có cả 2.4G và 5G thì tích cả hai, hoặc chọn <b>Mọi mạng</b>).',
+      auto4: 'Chọn <b>Chạy ngay</b> (tắt “Hỏi trước khi chạy”) ▸ <b>Tiếp</b>.',
+      auto5: 'Tìm <b>AdamDrop-auto</b> ▸ bấm vào ▸ <b>Xong</b>. Lần chạy đầu, iPhone hỏi thì cho phép <b>Mạng cục bộ</b>.',
+      auto6: 'Thử: tắt Wi-Fi rồi bật lại. iPhone báo một thông báo, ảnh mới hiện trên máy tính (thư mục xem ở tab Cài đặt).',
+      copy: 'Sao chép', copied: 'Đã chép ✓'
+    }
+  };
+
+  Object.assign(DICT.en,{sendMode:'Send to PC',receiveMode:'Receive from PC',refresh:'Refresh',emptyShares:'No files shared. Choose files on the PC first.',shareError:'Cannot load shared files. Check the connection or scan the QR again.',filesSave:'Save to Files',photosSave:'Save to Photos',photosHelp:'Save to Files downloads the original to Safari’s configured Downloads location (including iCloud Drive). Save to Photos opens the media right here in the page: touch and hold the image, then choose Save to Photos. AdamDrop cannot write to Photos automatically, and Safari always needs that last touch. Availability depends on the format and iOS.',vHelpPhoto:'Touch and hold the picture, then tap Save to Photos (or Add to Photos).',vHelpVideo:'Tap the Share button in Safari, then Save Video. If it does not appear, use Save to Files and share the file from there.',vOpenOriginal:'Open the original in a new tab',vClose:'Close',saveAll:'Save all to Files',savingAll:'Asking Safari to download {n} files…',savedAll:'Safari is downloading {n} files. It may ask you to allow multiple downloads. Photos are the exception: iOS gives no page permission to write to the Photos library, so each picture still needs one touch - open it and choose Save to Photos.',rcvScSummary:'⚡ One tap: get the whole batch into the Photos library (shortcut)',rcvSc1:'In the <b>Shortcuts</b> app make a new shortcut named <b>AdamDrop-get</b>. Copy this address first:',rcvSc2:'Add the action <b>Get Contents of URL</b>, paste that address in the <b>URL</b> field and leave the method as <b>GET</b>.',rcvSc3:'Add the action <b>Split Text</b>, tap <b>Split</b> and choose <b>New Lines</b>.',rcvSc4:'Add <b>Repeat with Each</b> and set it to run over the <b>Split Text</b> result.',rcvSc5:'Inside the loop add <b>Get Contents of URL</b> again: leave the <b>URL</b> box empty for now, tap it and insert the <b>Repeat Item</b> variable.',rcvSc6:'Still inside the loop add <b>Save to Photo Album</b> (pick an album or leave it as Recents), then <b>End Repeat</b>. Done: every run pulls all shared photos and videos straight into your photo library, no tapping picture by picture.',rcvScNote:'The shortcut is a system app, so it may write to Photos; a web page cannot. If an action name does not match your phone, send me a screenshot and I will correct this guide.',copy2:'Copy list address'});
+  Object.assign(DICT.vi,{sendMode:'Gửi sang PC',receiveMode:'Nhận từ PC',refresh:'Tải lại danh sách',emptyShares:'Chưa có tệp. Bạn chọn tệp trên PC trước nhé.',shareError:'Chưa tải được danh sách. Bạn kiểm tra kết nối hoặc quét lại QR nhé.',filesSave:'Lưu vào Tệp',photosSave:'Lưu vào Ảnh',photosHelp:'Lưu vào Tệp tải bản gốc về vị trí Tải về đã đặt trong Safari (có thể là iCloud Drive). Lưu vào Ảnh mở ảnh/video ngay trong trang này: nhấn giữ vào ảnh rồi chọn Lưu vào Ảnh. AdamDrop không tự ghi vào thư viện Ảnh, và Safari luôn cần một lần chạm cuối của bạn. Tùy định dạng và iOS, lựa chọn này có thể không xuất hiện.',vHelpPhoto:'Nhấn giữ vào ảnh, rồi chọn Lưu vào Ảnh (hoặc Thêm vào Ảnh).',vHelpVideo:'Bấm nút Chia sẻ của Safari, rồi chọn Lưu video. Nếu không thấy, dùng Lưu vào Tệp rồi chia sẻ từ tệp đó.',vOpenOriginal:'Mở bản gốc trong tab mới',vClose:'Đóng',saveAll:'Lưu tất cả vào Tệp',savingAll:'Đang yêu cầu Safari tải {n} tệp…',savedAll:'Safari đang tải {n} tệp, có thể nó sẽ hỏi cho phép tải nhiều tệp. Riêng Ảnh là ngoại lệ: iOS không cho trang web ghi vào thư viện Ảnh, nên mỗi ảnh vẫn cần một lần chạm - mở ảnh rồi chọn Lưu vào Ảnh.',rcvScSummary:'⚡ Một chạm: lấy cả loạt ảnh vào thẳng thư viện Ảnh (Phím tắt)',rcvSc1:'Mở app <b>Phím tắt</b>, tạo phím tắt mới tên <b>AdamDrop-nhan</b>. Trước tiên bấm <b>Sao chép</b> địa chỉ dưới đây:',rcvSc2:'Thêm tác vụ <b>Lấy nội dung của URL</b>, dán địa chỉ vừa sao chép vào ô <b>URL</b>, để nguyên phương thức <b>GET</b>.',rcvSc3:'Thêm tác vụ <b>Tách văn bản</b>, bấm <b>Tách</b> rồi chọn <b>Dòng mới</b>.',rcvSc4:'Thêm <b>Lặp lại với từng mục trong</b> và chọn kết quả của <b>Tách văn bản</b>.',rcvSc5:'Trong vòng lặp, thêm <b>Lấy nội dung của URL</b> lần nữa: để trống ô <b>URL</b>, bấm vào ô đó rồi chèn biến <b>Lặp lại mục</b>.',rcvSc6:'Vẫn trong vòng lặp, thêm <b>Lưu vào Album ảnh</b> (chọn album hoặc để mặc định), rồi thêm <b>Kết thúc lặp lại</b>. Xong: mỗi lần bấm chạy là toàn bộ ảnh/video PC đang chia sẻ vào thẳng thư viện Ảnh, không phải chạm từng ảnh.',rcvScNote:'Phím tắt là app hệ thống nên được phép ghi vào Ảnh; trang web thì không. Nếu tên tác vụ trên máy anh khác, anh gửi em ảnh chụp màn hình, em sửa lại hướng dẫn.',copy2:'Sao chép địa chỉ danh sách'});
+  var receiving = false, sharedFiles = [], shareError = false, shareLoading = false, savingAll = false;
+  function receiveRender() {
+    $('h1').textContent = receiving ? (lang === 'vi' ? 'Nhận từ ' : 'Receive from ') + PC : t('h1', {pc: PC});
+    $('status').hidden = receiving;
+    $('modeSend').textContent=t('sendMode'); $('modeReceive').textContent=t('receiveMode');
+    $('modeSend').className=receiving?'':'on'; $('modeReceive').className=receiving?'on':'';
+    $('sendPane').hidden=receiving; $('receivePane').hidden=!receiving;
+    $('receiveTitle').textContent=t('receiveMode'); $('refreshShares').textContent=t('refresh');
+    $('saveAllFiles').textContent=t('saveAll');
+    $('saveAllFiles').disabled=!sharedFiles.length||savingAll;
+    $('photosHelp').textContent=t('photosHelp');
+    if(!savingAll)$('receiveStatus').textContent=shareError?t('shareError'):(sharedFiles.length?'':t('emptyShares'));
+    var signature=JSON.stringify(sharedFiles)+lang;
+    if($('receiveQueue').dataset.signature===signature)return;
+    $('receiveQueue').dataset.signature=signature; $('receiveQueue').textContent='';
+    sharedFiles.forEach(function(f){
+      var item=document.createElement('div');item.className='receive-file';
+      var name=document.createElement('strong');name.textContent=f.name;item.appendChild(name);
+      var size=document.createElement('div');size.className='mini';size.textContent=fmt(f.size);item.appendChild(size);
+      var actions=document.createElement('div');actions.className='receive-actions';
+      var url='/download?k='+encodeURIComponent(KEY)+'&id='+encodeURIComponent(f.id);
+      var files=document.createElement('a');files.className='dl';files.href=url;files.download=f.name;files.textContent=t('filesSave');actions.appendChild(files);
+      if(/^(image|video)\//.test(f.mime)){
+        var photos=document.createElement('button');photos.type='button';photos.className='dl dl2';photos.textContent=t('photosSave');
+        photos.onclick=function(){openViewer(f,url+'&view=1');};actions.appendChild(photos);
+      }
+      item.appendChild(actions);$('receiveQueue').appendChild(item);
+    });
+  }
+  function receiveLoad(){
+    if(shareLoading)return;shareLoading=true;
+    fetch('/shares?k='+encodeURIComponent(KEY),{cache:'no-store'}).then(function(r){if(!r.ok)throw Error();return r.json();})
+      .then(function(j){sharedFiles=j.files;shareError=false;receiveRender();})
+      .catch(function(){sharedFiles=[];shareError=true;receiveRender();})
+      .finally(function(){shareLoading=false;});
+  }
+  function openViewer(f, url){
+    var isVideo=/^video\//.test(f.mime);
+    $('vTitle').textContent=f.name;
+    var body=$('vBody'); body.textContent='';
+    var el;
+    if(isVideo){el=document.createElement('video');el.controls=true;el.preload='metadata';el.setAttribute('playsinline','');}
+    else{el=document.createElement('img');el.alt=f.name;}
+    el.src=url;
+    body.appendChild(el);
+    $('vHelp').textContent=isVideo?t('vHelpVideo'):t('vHelpPhoto');
+    var o=$('vOpen'); o.textContent=t('vOpenOriginal'); o.href=url;
+    $('vClose').textContent=t('vClose');
+    $('viewer').hidden=false;
+  }
+  function closeViewer(){ $('viewer').hidden=true; $('vBody').textContent=''; }
+  $('vClose').onclick=closeViewer;
+  $('viewer').onclick=function(e){ if(e.target===this) closeViewer(); };
+  // Tải cả loạt bằng MỘT lần chạm: Safari tải từng tệp vào Tệp (có thể hỏi cho phép tải nhiều tệp).
+  // RIÊNG Ảnh: iOS không cho trang web ghi vào thư viện Ảnh nên mỗi ảnh vẫn cần một lần chạm.
+  $('saveAllFiles').onclick=function(){
+    if(savingAll||!sharedFiles.length)return;
+    savingAll=true; var n=sharedFiles.length;
+    $('receiveStatus').textContent=t('savingAll',{n:n});
+    $('saveAllFiles').disabled=true;
+    sharedFiles.forEach(function(f,i){
+      setTimeout(function(){
+        var a=document.createElement('a');
+        a.href='/download?k='+encodeURIComponent(KEY)+'&id='+encodeURIComponent(f.id);
+        a.download=f.name; a.rel='noopener';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        if(i===n-1){
+          $('receiveStatus').textContent=t('savedAll',{n:n});
+          savingAll=false; $('saveAllFiles').disabled=false;
+        }
+      },400*i);
+    });
+  };
+  $('modeSend').onclick=function(){receiving=false;receiveRender();};
+  $('modeReceive').onclick=function(){receiving=true;receiveRender();receiveLoad();};
+  $('refreshShares').onclick=receiveLoad;
+  setInterval(function(){if(receiving&&!document.hidden)receiveLoad();},3000);
+  document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"],img.applogo').forEach(function(el){el[el.tagName==='IMG'?'src':'href']='/logo.png?k='+encodeURIComponent(KEY);});
+
+  function t(key, vars) {
+    var s = (DICT[lang] && DICT[lang][key]) || (DICT.en[key] || key);
+    if (vars) for (var k in vars) { if (vars.hasOwnProperty(k)) s = s.split('{' + k + '}').join(vars[k]); }
+    return s;
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    $('status').textContent = t('idle');
+    receiveRender();
+    $('pickPhotos').textContent = t('pickPhotos');
+    $('pickFiles').textContent = t('pickFiles');
+    $('scSummary').textContent = t('scSummary');
+    $('scSteps').innerHTML =
+      '<li>' + t('scSheetNote') +
+        (SCFILE ?
+          '<div style="margin:10px 0 4px"><a class="dl" id="btnImport" href="#">' + t('scImport') + '</a></div>' +
+          '<div><a class="dl dl2" id="btnSheet" href="#">' + t('scSheet') + '</a></div>' +
+          '<div class="mini">' + t('scImportNote') + '</div>' :
+          '<div class="mini">' + t('scNoFile') + '</div>') + '</li>' +
+      '<li>' + t('sc1') + '</li><li>' + t('sc2') + '</li><li>' + t('sc3') + '</li>' +
+      '<li>' + t('sc4') + '</li><li>' + t('sc5') + '</li><li>' + t('sc6') + '</li>' +
+      '<li><details open><summary>' + t('scHandTitle') + '</summary><ol>' + t('scHand') + '</ol>' +
+        '<img class="gimg" src="/guide/ket-qua.png" alt="Phím tắt AdamDrop hoàn chỉnh">' +
+        '<div class="mini">' + t('scResult') + '</div>' +
+        '<div class="mini">' + t('scManual') + '</div>' +
+        '<div class="copy"><input id="scUrl" readonly><button id="scCopy" type="button">' + t('copy') + '</button></div>' +
+      '</details></li>';
+    $('rcvScSummary').textContent = t('rcvScSummary');
+    $('rcvScSteps').innerHTML =
+      '<li>' + t('rcvSc1') +
+        '<div class="copy"><input id="rcvScUrl" readonly><button id="rcvScCopy" type="button">' + t('copy2') + '</button></div>' +
+        '<div class="mini">' + t('rcvScNote') + '</div></li>' +
+      '<li>' + t('rcvSc2') + '</li><li>' + t('rcvSc3') + '</li><li>' + t('rcvSc4') + '</li>' +
+      '<li>' + t('rcvSc5') + '</li><li>' + t('rcvSc6') + '</li>';
+    var scFile = 'http://' + HOST + ':' + PORT + '/AdamDrop.shortcut?k=' + encodeURIComponent(KEY);
+    var bi = $('btnImport');
+    if (bi) bi.href = 'shortcuts://import-shortcut/?name=AdamDrop&url=' + encodeURIComponent(scFile);
+    var bs = $('btnSheet');
+    if (bs) bs.href = '/AdamDrop.shortcut?k=' + encodeURIComponent(KEY);
+    $('autoSummary').textContent = t('autoSummary');
+    $('autoSteps').innerHTML =
+      '<li>' + t('autoNote') +
+        (AUTOFILE ?
+          '<div style="margin:10px 0 4px"><a class="dl" id="btnAuto" href="#">' + t('autoBtn') + '</a></div>' +
+          '<div><a class="dl dl2" id="btnAuto2" href="#">' + t('autoBtn2') + '</a></div>' :
+          '<div class="mini">' + t('autoNoFile') + '</div>') + '</li>' +
+      '<li>' + t('auto1') + '</li><li>' + t('auto2') + '</li><li>' + t('auto3') + '</li>' +
+      '<li>' + t('auto4') + '</li><li>' + t('auto5') + '</li><li>' + t('auto6') + '</li>';
+    var autoFile = 'http://' + HOST + ':' + PORT + '/AdamDrop.auto.shortcut?k=' + encodeURIComponent(KEY);
+    var ba = $('btnAuto');
+    if (ba) ba.href = 'shortcuts://import-shortcut/?name=AdamDrop-auto&url=' + encodeURIComponent(autoFile);
+    var ba2 = $('btnAuto2');
+    if (ba2) ba2.href = '/AdamDrop.auto.shortcut?k=' + encodeURIComponent(KEY);
+    $('tip').innerHTML = t('tip') + '<span id="tipHost"></span>';
+    $('langEn').className = (lang === 'en' ? 'on' : '');
+    $('langVi').className = (lang === 'vi' ? 'on' : '');
+    wireCopy();
+    tipHost();
+    if (running) render(0);
+  }
+
+  function setLang(next) {
+    lang = (next === 'vi') ? 'vi' : 'en';
+    try { localStorage.setItem('adamdrop.lang', lang); } catch (e) {}
+    applyLang();
+  }
+  $('langEn').onclick = function () { setLang('en'); };
+  $('langVi').onclick = function () { setLang('vi'); };
+
+  function fmt(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(0) + ' KB';
+    if (n < 1073741824) return (n / 1048576).toFixed(1) + ' MB';
+    return (n / 1073741824).toFixed(2) + ' GB';
+  }
+
+  function setBusy(b) {
+    $('pickPhotos').setAttribute('aria-disabled', b ? 'true' : 'false');
+    $('pickFiles').setAttribute('aria-disabled', b ? 'true' : 'false');
+  }
+
+  function addFiles(files) {
+    if (!files || !files.length) return;
+    if (!running) {
+      doneBytes = 0; totalBytes = 0; doneCount = 0; failCount = 0; batchCount = 0;
+      $('list').innerHTML = '';
+      $('ovBar').classList.remove('done');
+    }
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var li = document.createElement('li');
+      li.innerHTML = '<span class="st">·</span><span class="n"></span><span class="s"></span>';
+      li.querySelector('.n').textContent = f.name || t('fileWord');
+      li.querySelector('.s').textContent = fmt(f.size);
+      $('list').appendChild(li);
+      queue.push({ file: f, li: li, tries: 0 });
+      totalBytes += f.size;
+      batchCount++;
+    }
+    $('listCard').style.display = 'block';
+    $('overall').style.display = 'block';
+    if (!running) { running = true; startedAt = Date.now(); setBusy(true); next(); }
+    render(0);
+  }
+
+  function render(current) {
+    var sent = doneBytes + current;
+    var pct = totalBytes ? Math.min(100, sent / totalBytes * 100) : 0;
+    $('ovBar').firstElementChild.style.width = pct.toFixed(1) + '%';
+    if (running) {
+      $('ovText').textContent = t('sending', { i: Math.min(doneCount + failCount + 1, batchCount), n: batchCount });
+      var secs = (Date.now() - startedAt) / 1000;
+      var speed = secs > 1 ? sent / secs : 0;
+      $('ovSub').textContent = fmt(sent) + ' / ' + fmt(totalBytes) + (speed ? ' · ' + fmt(speed) + '/s' : '');
+    }
+  }
+
+  function sidFor(f) { return (f.name || 'tep') + '|' + f.size + '|' + (f.lastModified || 0); }
+
+  function fileDone(item) {
+    doneCount++; doneBytes += item.file.size;
+    item.li.className = 'ok'; item.li.querySelector('.st').textContent = '✓';
+    var note = item.li.querySelector('.note'); if (note) note.remove();
+    render(0); next();
+  }
+
+  function fileFail(item) {
+    failCount++; doneBytes += item.file.size;
+    item.li.className = 'err'; item.li.querySelector('.st').textContent = '✕';
+    render(0); next();
+  }
+
+  function next() {
+    var item = queue.shift();
+    if (!item) return finish();
+    var f = item.file;
+    item.li.className = 'run';
+    item.li.querySelector('.st').textContent = '↑';
+    var sid = sidFor(f);
+    var rq = new XMLHttpRequest();
+    rq.open('GET', '/resume?k=' + encodeURIComponent(KEY) + '&sid=' + encodeURIComponent(sid), true);
+    rq.onload = function () {
+      var got = 0;
+      try { var j = JSON.parse(rq.responseText); if (j && j.ok) got = j.got || 0; } catch (e) {}
+      if (got >= f.size && f.size > 0) { fileDone(item); return; }
+      if (got > 0) {
+        var n = document.createElement('span');
+        n.className = 'note';
+        n.textContent = t('resume', { size: fmt(got) });
+        item.li.querySelector('.n').appendChild(n);
+      }
+      sendFrom(item, sid, got);
+    };
+    rq.onerror = function () { sendFrom(item, sid, 0); };
+    try { rq.send(); } catch (e) { sendFrom(item, sid, 0); }
+  }
+
+  function sendFrom(item, sid, off) {
+    var f = item.file;
+    if (off >= f.size && f.size > 0) { fileDone(item); return; }
+    var end = Math.min(off + CHUNK, f.size);
+    var blob;
+    try { blob = f.slice(off, end); } catch (e) { blob = f; off = 0; }
+    var url = '/upload?k=' + encodeURIComponent(KEY) +
+              '&name=' + encodeURIComponent(f.name || 'file') +
+              '&mtime=' + (f.lastModified || 0) +
+              '&sid=' + encodeURIComponent(sid) + '&off=' + off + '&total=' + f.size;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.upload.onprogress = function (e) { if (e.lengthComputable) render(off + e.loaded); };
+    var settled = false;
+    function again(got) {
+      if (settled) return; settled = true;
+      item.tries = 0;
+      sendFrom(item, sid, got);
+    }
+    function retryOrFail() {
+      if (settled) return; settled = true;
+      if (item.tries < 3) {
+        item.tries++;
+        item.li.querySelector('.st').textContent = '↻';
+        setTimeout(function () { sendFrom(item, sid, off); }, 1500);
+        return;
+      }
+      fileFail(item);
+    }
+    xhr.onload = function () {
+      if (settled) return;
+      var j = null;
+      try { j = JSON.parse(xhr.responseText); } catch (e) {}
+      if (xhr.status === 200 && j) {
+        if (j.done) {
+          settled = true;
+          if (j.name) item.li.querySelector('.n').textContent = j.name;
+          fileDone(item);
+          return;
+        }
+        if (j.error === 'offset' || j.error === 'partial') { again(j.got || 0); return; }
+        if (j.error === 'cancelled') { settled = true; fileFail(item); return; }
+      }
+      if (xhr.status === 403) { settled = true; fileFail(item); return; }
+      retryOrFail();
+    };
+    xhr.onerror = retryOrFail; xhr.onabort = retryOrFail; xhr.ontimeout = retryOrFail;
+    xhr.send(blob);
+  }
+
+  function finish() {
+    running = false; setBusy(false);
+    $('ovBar').firstElementChild.style.width = '100%';
+    if (failCount === 0) {
+      $('ovBar').classList.add('done');
+      $('ovText').textContent = t('doneOk', { n: doneCount });
+      $('status').textContent = t('statusOk');
+    } else {
+      $('ovText').textContent = t('doneSome', { ok: doneCount, bad: failCount });
+      $('status').textContent = t('statusSome');
+    }
+    $('ovSub').textContent = fmt(totalBytes);
+    if (doneCount > 0) {
+      var x = new XMLHttpRequest();
+      x.open('POST', '/done?k=' + encodeURIComponent(KEY) + '&count=' + doneCount, true);
+      try { x.send(); } catch (e) {}
+    }
+  }
+
+  ['filePhotos', 'fileAny'].forEach(function (id) {
+    $(id).addEventListener('change', function (e) {
+      var files = Array.prototype.slice.call(e.target.files || []);
+      addFiles(files);
+      e.target.value = '';
+    });
+  });
+
+  window.addEventListener('beforeunload', function (e) { if (running) { e.preventDefault(); e.returnValue = ''; } });
+
+  /* --- phan hoi giao dien sau khi dung lai ngon ngu --- */
+  var stableUrl = 'http://' + HOST + ':' + PORT + '/?k=' + encodeURIComponent(KEY);
+  var scOrigin = location.origin;
+
+  function wireCopy() {
+    wireOne($('scUrl'), $('scCopy'), scOrigin + '/upload?k=' + encodeURIComponent(KEY));
+    wireOne($('rcvScUrl'), $('rcvScCopy'), scOrigin + '/list?k=' + encodeURIComponent(KEY));
+  }
+  function wireOne(inp, btn, value) {
+    if (!inp || !btn) return;
+    inp.value = value;
+    inp.addEventListener('focus', function () { this.select(); });
+    btn.addEventListener('click', function () {
+      var ok = false;
+      inp.focus(); inp.select(); inp.setSelectionRange(0, 9999);
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      if (!ok && navigator.clipboard) { navigator.clipboard.writeText(inp.value).catch(function () {}); ok = true; }
+      btn.textContent = ok ? t('copied') : t('copy2');
+      setTimeout(function () { btn.textContent = t('copy2'); }, 2000);
+    });
+  }
+
+  function tipHost() {
+    var el = $('tipHost');
+    if (!el) return;
+    el.innerHTML = t('tipHome');
+    if (location.hostname.toLowerCase() !== HOST) {
+      el.innerHTML = '';
+      var ping = new XMLHttpRequest();
+      ping.open('GET', 'http://' + HOST + ':' + PORT + '/ping', true);
+      ping.timeout = 4000;
+      ping.onload = function () {
+        if (ping.status !== 200) return;
+        scOrigin = 'http://' + HOST + ':' + PORT;
+        wireCopy();
+        el.innerHTML = t('tipStable');
+        var a = el.querySelector('a');
+        if (a) { a.href = stableUrl; a.textContent = t('aStable'); }
+      };
+      try { ping.send(); } catch (e) {}
+    }
+  }
+
+  try { lang = localStorage.getItem('adamdrop.lang') || 'en'; } catch (e) { lang = 'en'; }
+  applyLang();
+})();
+</script>
+</body>
+</html>

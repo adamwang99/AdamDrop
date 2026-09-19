@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdamDrop · Dashboard</title>
+<link rel="icon" href="/logo.ico">
+<style>
+  :root {
+    --gold: #d89b2b; --gold-2: #f0be62; --ink: #111111;
+    --text: #f6f2ea; --sub: #b6ada0; --line: rgba(255,255,255,.14);
+    --glass: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    --ok: #58c98a; --warn: #f0a34a; --err: #ef6a5a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--text);
+    background:
+      radial-gradient(900px 500px at 12% -5%, rgba(216,155,43,.22), transparent 60%),
+      radial-gradient(800px 600px at 100% 0%, rgba(216,155,43,.10), transparent 55%),
+      linear-gradient(160deg, #16161a 0%, #0b0b0d 55%, #0d0d10 100%);
+    background-attachment: fixed;
+    padding: 12px 16px 16px;
+  }
+  .wrap { width: 100%; max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  @media (min-height: 600px) { .wrap { min-height: calc(100vh - 28px); } }
+  .glass { background: var(--glass); border: 1px solid var(--line); border-radius: 20px;
+    backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 12px 40px rgba(0,0,0,.45); }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(216,155,43,.45);
+    box-shadow: 0 6px 20px rgba(216,155,43,.22); background: #111; }
+  .brand { line-height: 1.15; }
+  .wordmark { font-size: 23px; font-weight: 800; letter-spacing: -.4px;
+    background: linear-gradient(100deg, #ffe6b0, var(--gold) 45%, #b87d16); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand small { color: #c6bdae; font-size: 12.5px; }
+  .pills { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pill { font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.05); color: var(--sub); }
+  .pill b { color: var(--text); font-weight: 600; }
+  .pill.ok { color: #bfe8cf; border-color: rgba(88,201,138,.4); }
+  .pill.warn { color: #f3d4a8; border-color: rgba(240,163,74,.45); background: rgba(240,163,74,.12); }
+  .lang { display: flex; gap: 2px; padding: 2px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.05); }
+  .lang button { border: 0; background: transparent; color: var(--sub); font: inherit; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+  .lang button.on { background: linear-gradient(140deg, var(--gold-2), var(--gold)); color: #1a1408; }
+  .seg { display: flex; gap: 2px; padding: 2px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.05); }
+  .seg button { border: 0; background: transparent; color: var(--sub); font: inherit; font-size: 13px; font-weight: 700;
+    padding: 6px 13px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+  .seg button.on { background: linear-gradient(140deg, var(--gold-2), var(--gold)); color: #1a1408; }
+  .ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .banner { display: none; padding: 12px 15px; border-radius: 16px;
+    background: rgba(240,163,74,.14); border: 1px solid rgba(240,163,74,.4); color: #f6dcc0; font-size: 13.5px; line-height: 1.55; }
+  .tabs { display: flex; gap: 5px; padding: 4px; border-radius: 14px; overflow-x: auto; }
+  .tab { border: 0; background: transparent; color: var(--sub); font: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 7px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.on { background: linear-gradient(140deg, rgba(216,155,43,.95), rgba(184,125,22,.9)); color: #1a1408; }
+  .grid { display: grid; gap: 16px; align-items: start; }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 900px) { .g3, .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 620px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+  .card { padding: 15px 16px; }
+  h2 { font-size: 14px; margin: 0 0 10px; color: var(--sub); font-weight: 600; }
+  h3 { font-size: 15px; margin: 0 0 8px; color: var(--text); font-weight: 700; }
+  .big { font-size: 30px; font-weight: 750; letter-spacing: -.6px; }
+  .big span { font-size: 14px; font-weight: 600; color: var(--sub); letter-spacing: 0; }
+  .muted { color: var(--sub); font-size: 13.5px; }
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.07); font-size: 14px; }
+  .row:first-of-type { border-top: 0; }
+  .row b { font-weight: 650; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.07); white-space: nowrap; }
+  th { color: var(--sub); font-weight: 600; font-size: 12.5px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { max-height: 460px; overflow: auto; }
+  td.path { max-width: 380px; font-size: 12px; color: #cbbfa6; }
+  ul.clean { list-style: none; margin: 0; padding: 0; }
+  ul.clean li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.07); font-size: 14px; }
+  ul.clean li:first-child { border-top: 0; }
+  ul.clean .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ul.clean .m { color: var(--sub); font-size: 12.5px; white-space: nowrap; }
+  button.btn { font: inherit; font-size: 13.5px; font-weight: 650; color: #1a1408; background: linear-gradient(140deg, var(--gold-2), var(--gold));
+    border: 0; border-radius: 11px; padding: 10px 14px; cursor: pointer; }
+  button.btn:hover { filter: brightness(1.06); }
+  button.ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--line); }
+  button.small { padding: 6px 10px; font-size: 12.5px; border-radius: 9px; }
+  button.danger { background: rgba(239,106,90,.18); color: #ffbdb4; border: 1px solid rgba(239,106,90,.4); }
+  /* nút bị khoá phải TRÔNG như bị khoá: trước đây nút mờ hệt nút thường nên tưởng bấm được */
+  button.btn:disabled, button.ghost:disabled { opacity: .45; cursor: default; filter: none; }
+  button.btn:disabled:hover { filter: none; }
+  /* o chon (dropdown) dung chung: nen kinh toi, chu sang, mui ten vang, bo goc 9px nhu nut ghost */
+  select, select.btn, select.small { appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    font: inherit; font-size: 12.5px; font-weight: 650; line-height: 1.35;
+    color: var(--text); background-color: rgba(255,255,255,.06);
+    border: 1px solid var(--line); border-radius: 9px; padding: 6px 30px 6px 10px; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23d89b2b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center; }
+  select:hover { background-color: rgba(255,255,255,.10); border-color: rgba(216,155,43,.5); }
+  select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(216,155,43,.16); }
+  select option { background: #141418; color: var(--text); font-size: 13px; }
+  .ctl select { vertical-align: middle; }
+  .kv { display: grid; grid-template-columns: 150px 1fr; gap: 8px 14px; font-size: 13.5px; }
+  .kv div:nth-child(odd) { color: var(--sub); }
+  code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; word-break: break-all; color: #e8dcc4; }
+  .sw { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.07); font-size: 14px; cursor: pointer; }
+  .sw:first-of-type { border-top: 0; }
+  .sw input { appearance: none; width: 42px; height: 24px; border-radius: 999px; background: rgba(255,255,255,.14);
+    border: 1px solid var(--line); position: relative; cursor: pointer; transition: background .15s; flex: none; }
+  .sw input:checked { background: linear-gradient(140deg, var(--gold-2), var(--gold)); border-color: transparent; }
+  .sw input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .15s; }
+  .sw input:checked::after { left: 21px; }
+  .sw span { color: var(--sub); font-size: 12.5px; display: block; }
+  pre#log { margin: 6px 0 0; max-height: 420px; overflow: auto; font-size: 12px; line-height: 1.55; color: #cfc6b3; white-space: pre-wrap;
+    padding: 12px 14px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid var(--line); }
+  .hide { display: none !important; }
+  .flash { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); padding: 12px 18px; border-radius: 14px;
+    background: rgba(20,20,24,.92); border: 1px solid rgba(216,155,43,.5); color: var(--text); font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .flash.on { opacity: 1; }
+  /* --- Overview: QR first, everything inside one screen --- */
+  #tab-ov { display: grid; grid-template-columns: minmax(240px, 344px) minmax(0, 1fr); gap: 12px; align-items: start; flex: 1; min-height: 0; }
+  @media (max-width: 880px) { #tab-ov { grid-template-columns: 1fr; } }
+  .qrcard { display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
+  .qrcard h2 { margin: 0; }
+  #qrBox { display: grid; place-items: center; width: 100%; min-height: 0; }
+  #qr { background: #fff; border-radius: 14px; padding: 10px; display: inline-block; line-height: 0; }
+  #qr svg { width: 100%; height: 100%; display: block; }
+  .qrlink { font-size: 12.5px; text-align: center; color: #f2e8d4; cursor: pointer; overflow-wrap: anywhere; }
+  .qrmini { margin: 12px 0; text-align: center; }
+  .steps { display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 4px; }
+  .steps div { color: var(--sub); font-size: 13.5px; }
+  .steps b { color: var(--gold-2); font-weight: 700; }
+  .side { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .side > .card:last-child { flex: 1; min-height: 0; }
+  .strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .strip > div + div { border-left: 1px solid var(--line); padding-left: 12px; }
+  .strip .n { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+  .strip .n small { font-size: 12px; font-weight: 600; color: var(--sub); }
+  .sp3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+  .sp3 .l { color: var(--sub); font-size: 12px; }
+  .sp3 .n { font-size: 19px; font-weight: 700; letter-spacing: -.4px; }
+  #recentWrap { min-height: 0; overflow: auto; max-height: min(26vh, 240px); }
+  @media (min-width: 881px) and (max-height: 680px) { #recentWrap { max-height: max(64px, calc(100vh - 570px)); } }
+  #sharePanel[open] > summary { margin-bottom: 12px; }
+  .prog { height: 6px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 8px; }
+  .prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-2)); }
+  /* --- Guide & About --- */
+  .doc { font-size: 14px; line-height: 1.65; color: #e9e2d6; }
+  .doc h3 { margin: 18px 0 8px; }
+  .doc h3:first-child { margin-top: 0; }
+  .doc ol, .doc ul { margin: 6px 0 6px 20px; padding: 0; }
+  .doc li { margin: 4px 0; }
+  .doc p { margin: 6px 0; }
+  .doc b { color: #fff; }
+  .doc .k { color: var(--gold-2); font-weight: 650; }
+  .doc a { color: var(--gold-2); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(216,155,43,.45); }
+  .doc a:hover { color: #fff; border-bottom-color: #fff; }
+  .doc .warnbox { margin: 10px 0; padding: 10px 12px; border-radius: 12px; background: rgba(240,163,74,.12);
+    border: 1px solid rgba(240,163,74,.35); color: #f6dcc0; }
+  .doc .okbox { margin: 10px 0; padding: 10px 12px; border-radius: 12px; background: rgba(88,201,138,.10);
+    border: 1px solid rgba(88,201,138,.32); color: #cfeee0; }
+  .doc table { margin: 8px 0; }
+  .doc th, .doc td { white-space: normal; }
+  .abouthead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .abouthead img { width: 96px; height: 96px; border-radius: 18px; border: 1px solid rgba(216,155,43,.45); background: #111; }
+  .founder { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .founder img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(216,155,43,.5); }
+  .tag { display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--sub); margin: 0 6px 6px 0; }
+  .gstep { margin: 16px 0 6px; font-size: 14px; font-weight: 700; color: var(--gold-2); }
+  .gimg { display: block; width: 100%; max-width: 400px; margin: 8px 0 4px; border-radius: 10px; border: 1px solid var(--line); }
+  ol.gnum { margin: 4px 0 2px; padding-left: 20px; }
+  ol.gnum li { margin: 3px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="/logo-small.png" alt="AdamDrop">
+    <div class="brand">
+      <div class="wordmark">AdamDrop</div>
+      <small data-i18n="head.sub">Transfer files between iPhone and PC over Wi-Fi</small>
+    </div>
+    <div class="pills">
+      <div id="pills"></div>
+      <div class="lang">
+        <button id="langEn" data-lang="en">EN</button>
+        <button id="langVi" data-lang="vi">VI</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner" id="netBanner"></div>
+
+  <div class="tabs glass">
+    <button class="tab on" data-tab="ov" data-i18n="tab.ov">Overview</button>
+    <button class="tab" data-tab="hist" data-i18n="tab.hist">History</button>
+    <button class="tab" data-tab="conn" data-i18n="tab.conn">Connections</button>
+    <button class="tab" data-tab="guide" data-i18n="tab.guide">Guide</button>
+    <button class="tab" data-tab="about" data-i18n="tab.about">About</button>
+    <button class="tab" data-tab="set" data-i18n="tab.set">Settings</button>
+  </div>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="tab-ov">
+    <div class="card glass qrcard">
+      <h2 data-i18n="ov.qrTitle">Scan this with the iPhone Camera</h2>
+      <div id="qrBox"><div id="qr"></div></div>
+      <div class="qrlink mono" id="qrUrl" data-i18n-title="ov.qrCopyHint" title="Click to copy"></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center">
+        <button class="btn" id="btnQrHost" data-i18n="ov.qrFixed">Use fixed address</button>
+        <button class="btn ghost" id="btnCopy" data-i18n="ov.qrCopy">Copy</button>
+      </div>
+    </div>
+
+    <div class="side">
+  <details id="sharePanel" class="card glass">
+    <summary data-i18n="share.title" style="cursor:pointer;color:var(--gold);font-weight:600">Send to iPhone</summary>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sharePick" data-i18n="share.pick">Choose files</button><button class="btn" id="shareStop" data-i18n="share.stop">Stop sharing</button></div>
+    <p class="muted" data-i18n="share.hint"></p><p id="shareStatus" role="status"></p>
+    <ul id="shareQueue" style="padding:0;list-style:none;max-height:220px;overflow:auto"></ul>
+  </details>
+
+      <div class="card glass hide" id="liveCard">
+        <h2 data-i18n="ov.live">Receiving now</h2>
+        <div id="liveBox"></div>
+      </div>
+
+      <div class="card glass">
+        <div style="display:flex; align-items:baseline; gap:10px">
+          <h2 style="margin:0" data-i18n="ov.lastTitle">Last share</h2>
+          <span class="muted" id="lastWhen" style="margin-left:auto"></span>
+        </div>
+        <div class="muted" id="lastLine" style="margin-top:6px"></div>
+        <div class="sp3" id="sp3">
+          <div><div class="l" data-i18n="ov.max">Peak</div><div class="n" id="spMax">-</div></div>
+          <div><div class="l" data-i18n="ov.min">Lowest</div><div class="n" id="spMin">-</div></div>
+          <div><div class="l" data-i18n="ov.avg">Average</div><div class="n" id="spAvg">-</div></div>
+        </div>
+        <div class="muted hide" id="spEmpty" style="margin-top:10px" data-i18n="ov.noSpeeds">No transfer yet, so no speed to show.</div>
+      </div>
+
+      <div class="card glass strip">
+        <div><div class="l muted" data-i18n="ov.today">Today</div><div class="n"><span id="sTodayN">0</span> <small data-i18n="unit.files">files</small></div><div class="muted" id="sTodayB">0 B</div></div>
+        <div><div class="l muted" data-i18n="ov.week">Last 7 days</div><div class="n"><span id="sWeekN">0</span> <small data-i18n="unit.files">files</small></div><div class="muted" id="sWeekB">0 B</div></div>
+        <div><div class="l muted" data-i18n="ov.all">All time</div><div class="n"><span id="sAllN">0</span> <small data-i18n="unit.files">files</small></div><div class="muted" id="sAllB">0 B</div></div>
+      </div>
+
+      <div class="card glass" style="display:flex; flex-direction:column; min-height:0">
+        <div style="display:flex; align-items:center; gap:10px">
+          <h2 style="margin:0" data-i18n="ov.recent">Recently received</h2>
+          <button class="btn ghost small" id="btnOpenDir" style="margin-left:auto" data-i18n="ov.openDir">Open folder</button>
+        </div>
+        <div id="recentWrap" style="flex:1; min-height:0; overflow:auto; margin-top:6px">
+          <ul class="clean" id="recent"></ul>
+          <div class="steps" id="recentHint">
+            <div><b>1.</b> <span data-i18n="ov.step1">Open Camera on the iPhone and scan the QR code on the left</span></div>
+            <div><b>2.</b> <span data-i18n="ov.step2">Tap the link that appears, then pick Photos or Videos</span></div>
+            <div><b>3.</b> <span data-i18n="ov.step3">Files land here when they arrive, tap a name to open it</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GUIDE ================= -->
+  <section id="tab-guide" class="grid hide">
+    <div class="card glass doc" id="guideBody"></div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="tab-about" class="grid hide">
+    <div class="card glass">
+      <div class="abouthead">
+        <img src="/logo-small.png" alt="AdamDrop">
+        <div>
+          <h3 style="margin:0">AdamDrop</h3>
+          <div class="muted" id="aboutVersion"></div>
+          <div style="margin-top:8px" id="aboutTags"></div>
+        </div>
+      </div>
+      <div class="doc" id="aboutBody" style="margin-top:14px"></div>
+    </div>
+    <div class="card glass">
+      <h3 data-i18n="about.founder">Behind the channel</h3>
+      <div class="founder">
+        <img src="/adam-chan-dung.png" alt="Adam">
+        <div class="doc" id="founderBody" style="flex:1; min-width:260px"></div>
+      </div>
+    </div>
+    <div class="card glass">
+      <h3 data-i18n="about.paths">Files and folders this app keeps</h3>
+      <div class="kv">
+        <div data-i18n="set.dir">Save folder</div><div class="mono" id="aDir"></div>
+        <div data-i18n="set.ini">Settings file</div><div class="mono" id="aIni"></div>
+        <div data-i18n="set.log">Log file</div><div class="mono" id="aLog"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HISTORY ================= -->
+  <section id="tab-hist" class="grid hide">
+    <div class="card glass">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px">
+        <h2 style="margin:0" data-i18n="hist.title">Share history</h2>
+        <div class="seg">
+          <button class="on" id="segHist" data-i18n="hist.segHist">Shares</button>
+          <button id="segLog" data-i18n="hist.segLog">Log</button>
+        </div>
+        <span class="ctl" id="histCtl">
+          <select id="days" class="ghost small" title="" aria-label="range">
+            <option value="1" data-i18n="hist.d1">Today</option>
+            <option value="7" selected data-i18n="hist.d7">7 days</option>
+            <option value="30" data-i18n="hist.d30">30 days</option>
+            <option value="90" data-i18n="hist.d90">90 days</option>
+            <option value="0" data-i18n="hist.d0">All</option>
+          </select>
+          <button class="btn ghost small" id="btnHistReload" data-i18n="btn.reload">Reload</button>
+        </span>
+        <span class="ctl hide" id="logCtl">
+          <button class="btn ghost small" id="btnLogReload" data-i18n="btn.reload">Reload</button>
+          <button class="btn ghost small" id="btnOpenLog" data-i18n="log.open">Open log file</button>
+        </span>
+      </div>
+      <div id="paneHist">
+      <div class="scroll">
+        <table>
+          <thead><tr>
+            <th data-i18n="hist.time">Time</th><th class="num" data-i18n="hist.files">Files</th><th class="num" data-i18n="hist.size">Size</th>
+            <th class="num" data-i18n="hist.dur">Duration</th><th class="num" data-i18n="ov.max">Peak</th><th class="num" data-i18n="ov.min">Lowest</th>
+            <th class="num" data-i18n="ov.avg">Average</th><th data-i18n="hist.lastFile">Last file</th>
+            <th data-i18n="hist.path">Saved to</th>
+          </tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+        </div>
+        <div class="muted" style="margin-top:10px" data-i18n="hist.note">History is stored on this PC in history.tsv, so it survives restarts.</div>
+      </div>
+      <div id="paneLog" class="hide">
+        <pre id="log"></pre>
+        <div class="muted" style="margin-top:10px" data-i18n="log.note">The log never contains the connection key.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONNECTIONS ================= -->
+  <section id="tab-conn" class="grid hide">
+    <div class="grid g4">
+      <div class="card glass"><h2 data-i18n="conn.status">Port status</h2><div class="big" id="cListen" style="font-size:22px">-</div><div class="muted" id="cSince"></div></div>
+      <div class="card glass"><h2 data-i18n="conn.live">Active transfers</h2><div class="big" id="cLive" style="font-size:22px">0</div><div class="muted" data-i18n="conn.liveSub">file connections</div></div>
+      <div class="card glass"><h2 data-i18n="conn.req">Requests served</h2><div class="big" id="cReq" style="font-size:22px">0</div><div class="muted" data-i18n="conn.reqSub">since this boot</div></div>
+      <div class="card glass"><h2 data-i18n="conn.parts">Unfinished files</h2><div class="big" id="cParts" style="font-size:22px">0</div><div class="muted" data-i18n="conn.partsSub">kept 24 hours so you can resume</div></div>
+    </div>
+    <div class="card glass">
+      <h2 data-i18n="conn.now">Receiving now</h2>
+      <table>
+        <thead><tr><th data-i18n="conn.fFile">File</th><th class="num" data-i18n="conn.fGot">Received</th><th class="num" data-i18n="conn.fSpeed">Speed</th>
+        <th class="num" data-i18n="conn.fTime">Elapsed</th><th data-i18n="conn.fFrom">From</th><th></th></tr></thead>
+        <tbody id="liveBody"></tbody>
+      </table>
+    </div>
+    <div class="card glass">
+      <h2 data-i18n="conn.partsTitle">Unfinished files (the iPhone can resume these)</h2>
+      <table>
+        <thead><tr><th data-i18n="conn.pId">Session</th><th class="num" data-i18n="conn.pGot">Received</th><th data-i18n="conn.pWhen">Last seen</th><th></th></tr></thead>
+        <tbody id="partsBody"></tbody>
+      </table>
+      <div class="muted" style="margin-top:10px" data-i18n="conn.partsNote">Windows keeps HTTP connections alive between files; the table above lists real file transfers only.</div>
+    </div>
+  </section>
+
+  <!-- ================= SETTINGS ================= -->
+  <section id="tab-set" class="grid hide">
+    <div class="grid g2">
+      <div class="card glass">
+        <h2 data-i18n="set.where">Where files are saved</h2>
+        <div class="mono" id="setDir" style="margin-bottom:12px"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn" id="btnPick" data-i18n="set.pick">Choose a folder on this PC</button>
+          <button class="btn ghost" id="btnOpenDir2" data-i18n="set.open">Open folder</button>
+        </div>
+        <div class="muted" id="pickHint" style="margin-top:10px" data-i18n="set.pickHint">The Windows folder picker opens on the PC screen.</div>
+      </div>
+      <div class="card glass">
+        <h2 data-i18n="set.key">Connection key</h2>
+        <div class="mono" id="setKey" style="margin-bottom:12px"></div>
+        <button class="btn ghost" id="btnNewKey" data-i18n="set.newKey">Generate a new key</button>
+        <div class="muted" style="margin-top:10px" data-i18n="set.keyHint">After changing the key you must scan the QR code again on the iPhone.</div>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card glass">
+        <h2 data-i18n="set.options">Options</h2>
+        <label class="sw"><input type="checkbox" id="optAutoOpen"><div><span data-i18n="set.autoOpen">Open the folder when a batch is done</span><span data-i18n="set.autoOpenSub">Explorer opens with the newest file selected</span></div></label>
+        <label class="sw"><input type="checkbox" id="optAwake"><div><span data-i18n="set.awake">Keep this PC awake while receiving</span><span data-i18n="set.awakeSub">Long videos finish even if nobody touches the PC</span></div></label>
+        <label class="sw"><input type="checkbox" id="optAutoRun"><div><span data-i18n="set.autoRun">Start with Windows</span><span data-i18n="set.autoRunSub">The port is open every time you sign in, no clicks</span></div></label>
+      </div>
+      <div class="card glass">
+        <h2 data-i18n="set.info">This PC</h2>
+        <div class="kv">
+          <div data-i18n="set.pc">Computer</div><div id="iPc"></div>
+          <div data-i18n="set.port">Port</div><div id="iPort"></div>
+          <div data-i18n="set.net">Network</div><div id="iNet"></div>
+          <div data-i18n="set.host">Fixed address</div><div class="mono" id="iHost"></div>
+          <div data-i18n="set.ips">Addresses</div><div class="mono" id="iIps"></div>
+          <div data-i18n="set.lang">Interface language</div><div id="iLang"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<div class="flash" id="flash"></div>
+
+<script src="/qrcode.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var state = null, qrUrl = null, wantHost = false, tab = 'ov';
+  var lang = 'en', T = {};
+
+  /* ---------------- text ---------------- */
+  var DICT = {
+    en: {
+      'scNoFile': 'This build does not ship the ready-made shortcut file (that file carries your key). Use the hand-built steps below - they work on every iPhone.',
+      'autoNoFile': 'This build does not ship the ready-made automatic shortcut file. Build it by hand with the steps below.',
+      'head.sub': 'Transfer files between iPhone and PC over Wi-Fi',
+      'tab.ov': 'Overview', 'tab.hist': 'History', 'tab.conn': 'Connections', 'tab.guide': 'Guide',
+      'tab.about': 'About', 'tab.set': 'Settings', 'tab.log': 'Log',
+      'pill.port': 'Port {p}', 'pill.open': 'open', 'pill.closed': 'closed',
+      'pill.net': 'Network', 'pill.from': 'Since {t}',
+      'banner.public': '<b>This PC is on a Public network ({n}).</b> The port is open for public networks as configured, but only a device with the correct key can send files here. After 20 wrong keys a device is blocked for one minute. For tighter security set this network to Private in Windows Settings.',
+      'ov.qrTitle': 'Scan this with the iPhone Camera', 'ov.qrFixed': 'Use fixed address', 'ov.qrIp': 'Use IP address',
+      'ov.qrCopy': 'Copy', 'ov.qrCopyHint': 'Click to copy the address', 'ov.live': 'Receiving now',
+      'ov.lastTitle': 'Last share', 'ov.max': 'Peak', 'ov.min': 'Lowest', 'ov.avg': 'Average',
+      'ov.noSpeeds': 'No transfer yet, so no speed to show.',
+      'ov.today': 'Today', 'ov.week': 'Last 7 days', 'ov.all': 'All time',
+      'ov.recent': 'Recently received', 'ov.openDir': 'Open folder',
+      'ov.step1': 'Open Camera on the iPhone and scan the QR code on the left',
+      'ov.step2': 'Tap the link that appears, then pick Photos or Videos',
+      'ov.step3': 'Files land here when they arrive, tap a name to open it',
+      'ov.none': 'Nothing received yet. Scan the QR code on the left to start.',
+      'ov.filesLine': '<b>{n} file(s)</b> · {size} · {sec} · {name}',
+      'ov.fileLine': '<b>{n} files</b> · {size} · {sec} · <span class="mono">{name}</span>',
+      'ov.oneLine': '<b>1 file</b> · {size} · {sec} · <span class="mono">{name}</span>',
+      'unit.files': 'files', 'unit.file': 'file',
+      'sec.dur': '{s} s', 'sec.min': '{m} min {s} s',
+      'ov.recv': '{done} / {total} · {pct}%', 'ov.more': ' · {n} more connection(s)',
+      'hist.title': 'Share history', 'hist.d1': 'Today', 'hist.d7': '7 days', 'hist.d30': '30 days',
+      'hist.d90': '90 days', 'hist.d0': 'All', 'hist.time': 'Time', 'hist.files': 'Files',
+      'hist.size': 'Size', 'hist.dur': 'Duration', 'hist.lastFile': 'Last file', 'hist.path': 'Saved to',
+      'hist.note': 'History is stored on this PC in history.tsv, so it survives restarts.',
+      'hist.empty': 'No history in this range yet.', 'hist.loading': 'Loading…',
+      'hist.segHist': 'Shares', 'hist.segLog': 'Log',
+      'conn.status': 'Port status', 'conn.open': 'Open', 'conn.shut': 'Closed', 'conn.since': 'since {t}',
+      'conn.live': 'Active transfers', 'conn.liveSub': 'file connections', 'conn.req': 'Requests served',
+      'conn.reqSub': 'since this boot', 'conn.parts': 'Unfinished files', 'conn.partsSub': 'kept 24 hours so you can resume',
+      'conn.now': 'Receiving now', 'conn.none': 'No transfer running.',
+      'conn.fFile': 'File', 'conn.fGot': 'Received', 'conn.fSpeed': 'Speed', 'conn.fTime': 'Elapsed', 'conn.fFrom': 'From',
+      'conn.partsTitle': 'Unfinished files (the iPhone can resume these)', 'conn.pId': 'Session',
+      'conn.pGot': 'Received', 'conn.pWhen': 'Last seen', 'conn.pEmpty': 'No unfinished file.',
+      'conn.partsNote': 'Windows keeps HTTP connections alive between files; the table above lists real file transfers only.',
+      'cancel': 'Cancel', 'remove': 'Remove',
+      'set.where': 'Where files are saved', 'set.pick': 'Choose a folder on this PC', 'set.open': 'Open folder',
+      'set.pickHint': 'The Windows folder picker opens on the PC screen.',
+      'set.waitPick': 'Waiting for you to choose a folder on the PC screen…',
+      'set.picked': 'Folder changed to: {d}', 'set.pickCancel': 'You cancelled the folder picker.',
+      'set.pickFail': 'Could not open the folder picker.',
+      'set.key': 'Connection key', 'set.newKey': 'Generate a new key',
+      'set.keyHint': 'After changing the key you must scan the QR code again on the iPhone.',
+      'set.keyConfirm': 'Generate a new key? You will have to scan the QR code again and update any iOS Shortcut.',
+      'set.options': 'Options', 'set.autoOpen': 'Open the folder when a batch is done',
+      'set.autoOpenSub': 'Explorer opens with the newest file selected',
+      'set.awake': 'Keep this PC awake while receiving', 'set.awakeSub': 'Long videos finish even if nobody touches the PC',
+      'set.autoRun': 'Start with Windows', 'set.autoRunSub': 'The port is open every time you sign in, no clicks',
+      'set.info': 'This PC', 'set.pc': 'Computer', 'set.port': 'Port', 'set.net': 'Network',
+      'set.host': 'Fixed address', 'set.ips': 'Addresses', 'set.lang': 'Interface language',
+      'set.dir': 'Save folder', 'set.ini': 'Settings file', 'set.log': 'Log file',
+      'net.Private': 'Private', 'net.Public': 'Public', 'net.Domain': 'Domain', 'net.unknown': 'unknown',
+      'log.title': 'Log (last 200 lines)', 'log.open': 'Open log file', 'log.note': 'The log never contains the connection key.',
+      'log.fail': 'Could not read the log.',
+      'btn.reload': 'Reload', 'copy.done': 'Address copied', 'lost': 'Lost connection to AdamDrop',
+      'about.files': '{n} file(s)', 'about.tags': 'Local · Free · No account',
+      'about.founder': 'Behind the channel', 'about.paths': 'Files and folders this app keeps',
+      'about.version': 'Version {v} · port {p} · running since {t}',
+      'acted.done': 'Saved: {c}',
+      'req.fail': 'Could not send the request'
+    },
+    vi: {
+      'scNoFile': 'Bản này không kèm tệp phím tắt dựng sẵn (tệp đó chứa mã khoá). Anh dùng cách dựng bằng tay bên dưới - chạy được trên mọi iPhone.',
+      'autoNoFile': 'Bản này không kèm tệp phím tắt tự động dựng sẵn. Anh dựng bằng tay theo các bước bên dưới.',
+      'head.sub': 'Chuyển tệp giữa iPhone và PC qua Wi-Fi',
+      'tab.ov': 'Tổng quan', 'tab.hist': 'Lịch sử', 'tab.conn': 'Kết nối', 'tab.guide': 'Hướng dẫn',
+      'tab.about': 'Giới thiệu', 'tab.set': 'Cài đặt', 'tab.log': 'Nhật ký',
+      'pill.port': 'Cổng {p}', 'pill.open': 'đang mở', 'pill.closed': 'chưa mở',
+      'pill.net': 'Mạng', 'pill.from': 'Từ {t}',
+      'banner.public': '<b>Máy tính đang ở mạng Công cộng ({n}).</b> Cổng đã mở cho cả mạng công cộng theo thiết lập, nhưng chỉ thiết bị có đúng mã khoá mới gửi được tệp vào máy này. Sau 20 lần sai mã khoá, thiết bị đó bị tạm khoá 1 phút. Muốn kín hơn: đặt mạng này là Riêng tư trong Cài đặt Windows.',
+      'ov.qrTitle': 'Quét mã này bằng Camera trên iPhone', 'ov.qrFixed': 'Dùng địa chỉ cố định', 'ov.qrIp': 'Dùng địa chỉ theo IP',
+      'ov.qrCopy': 'Sao chép', 'ov.qrCopyHint': 'Bấm để sao chép địa chỉ', 'ov.live': 'Đang nhận',
+      'ov.lastTitle': 'Lần chia sẻ gần nhất', 'ov.max': 'Cao nhất', 'ov.min': 'Thấp nhất', 'ov.avg': 'Trung bình',
+      'ov.noSpeeds': 'Chưa có lượt nhận nào để đo tốc độ.',
+      'ov.today': 'Hôm nay', 'ov.week': '7 ngày', 'ov.all': 'Tổng cộng',
+      'ov.recent': 'Nhận gần đây', 'ov.openDir': 'Mở thư mục nhận',
+      'ov.step1': 'Mở Camera trên iPhone, quét mã QR bên trái',
+      'ov.step2': 'Bấm liên kết vừa hiện, chọn Ảnh hoặc Video',
+      'ov.step3': 'Tệp nhận xong sẽ hiện ở đây, bấm tên để mở',
+      'ov.none': 'Chưa nhận tệp nào. Quét mã bên trái bằng iPhone để bắt đầu.',
+      'ov.fileLine': '<b>{n} tệp</b> · {size} · {sec} · <span class="mono">{name}</span>',
+      'ov.oneLine': '<b>1 tệp</b> · {size} · {sec} · <span class="mono">{name}</span>',
+      'unit.files': 'tệp', 'unit.file': 'tệp',
+      'sec.dur': '{s} giây', 'sec.min': '{m} phút {s} giây',
+      'ov.recv': '{done} / {total} · {pct}%', 'ov.more': ' · còn {n} kết nối nữa',
+      'hist.title': 'Lịch sử chia sẻ', 'hist.d1': 'Hôm nay', 'hist.d7': '7 ngày', 'hist.d30': '30 ngày',
+      'hist.d90': '90 ngày', 'hist.d0': 'Tất cả', 'hist.time': 'Thời gian', 'hist.files': 'Số tệp',
+      'hist.size': 'Dung lượng', 'hist.dur': 'Thời lượng', 'hist.lastFile': 'Tệp cuối', 'hist.path': 'Đường dẫn lưu',
+      'hist.note': 'Lịch sử lưu trên máy tính này trong history.tsv nên tắt máy không mất.',
+      'hist.empty': 'Chưa có lịch sử trong khoảng này.', 'hist.loading': 'Đang tải…',
+      'hist.segHist': 'Lượt nhận', 'hist.segLog': 'Nhật ký',
+      'conn.status': 'Trạng thái', 'conn.open': 'Đang mở', 'conn.shut': 'Chưa mở', 'conn.since': 'từ {t}',
+      'conn.live': 'Phiên đang nhận', 'conn.liveSub': 'kết nối truyền tệp', 'conn.req': 'Yêu cầu đã xử lý',
+      'conn.reqSub': 'từ lúc mở máy', 'conn.parts': 'Tệp đang dở', 'conn.partsSub': 'giữ 24 giờ để gửi tiếp',
+      'conn.now': 'Đang nhận tệp', 'conn.none': 'Không có phiên nào đang chạy.',
+      'conn.fFile': 'Tệp', 'conn.fGot': 'Đã nhận', 'conn.fSpeed': 'Tốc độ', 'conn.fTime': 'Thời gian', 'conn.fFrom': 'Nguồn',
+      'conn.partsTitle': 'Tệp gửi dở (có thể gửi tiếp trên điện thoại)', 'conn.pId': 'Mã phiên',
+      'conn.pGot': 'Đã nhận', 'conn.pWhen': 'Lần cuối', 'conn.pEmpty': 'Không có tệp dở.',
+      'conn.partsNote': 'Kết nối HTTP được Windows giữ sẵn giữa các tệp; bảng trên chỉ liệt kê các phiên truyền tệp thật.',
+      'cancel': 'Huỷ', 'remove': 'Xoá',
+      'set.where': 'Nơi lưu tệp', 'set.pick': 'Chọn thư mục trên máy tính', 'set.open': 'Mở thư mục',
+      'set.pickHint': 'Hộp thoại chọn thư mục sẽ hiện trên màn hình máy tính.',
+      'set.waitPick': 'Đang chờ anh chọn thư mục trên màn hình máy tính…',
+      'set.picked': 'Đã đổi sang: {d}', 'set.pickCancel': 'Đã huỷ chọn thư mục.',
+      'set.pickFail': 'Không gọi được hộp thoại chọn thư mục.',
+      'set.key': 'Mã khoá kết nối', 'set.newKey': 'Đổi mã khoá mới',
+      'set.keyHint': 'Đổi mã thì phải quét lại mã QR trên iPhone và sửa địa chỉ trong Phím tắt.',
+      'set.keyConfirm': 'Đổi mã khoá mới? Sau đó phải quét lại mã QR trên iPhone và sửa địa chỉ trong Phím tắt.',
+      'set.options': 'Tuỳ chọn', 'set.autoOpen': 'Tự mở thư mục khi nhận xong',
+      'set.autoOpenSub': 'Mở Explorer và chọn tệp vừa nhận',
+      'set.awake': 'Ngăn máy ngủ khi đang nhận', 'set.awakeSub': 'Video dài vẫn chạy xong dù không ai chạm máy',
+      'set.autoRun': 'Chạy cùng Windows', 'set.autoRunSub': 'Bật sẵn cổng mỗi khi đăng nhập, không cần bấm gì',
+      'set.info': 'Máy này', 'set.pc': 'Máy tính', 'set.port': 'Cổng', 'set.net': 'Mạng',
+      'set.host': 'Địa chỉ cố định', 'set.ips': 'Địa chỉ', 'set.lang': 'Ngôn ngữ giao diện',
+      'set.dir': 'Thư mục nhận tệp', 'set.ini': 'Tệp cấu hình', 'set.log': 'Tệp nhật ký',
+      'net.Private': 'Riêng tư', 'net.Public': 'Công cộng', 'net.Domain': 'Miền', 'net.unknown': 'chưa rõ',
+      'log.title': 'Nhật ký (200 dòng gần nhất)', 'log.open': 'Mở tệp nhật ký', 'log.note': 'Nhật ký không bao giờ ghi mã khoá kết nối.',
+      'log.fail': 'Không đọc được nhật ký.',
+      'btn.reload': 'Tải lại', 'copy.done': 'Đã sao chép địa chỉ', 'lost': 'Mất kết nối tới AdamDrop',
+      'about.files': '{n} tệp', 'about.tags': 'Chạy tại máy · Miễn phí · Không cần tài khoản',
+      'about.founder': 'Người đứng sau kênh', 'about.paths': 'Tệp và thư mục của ứng dụng',
+      'about.version': 'Bản {v} · cổng {p} · chạy từ {t}',
+      'acted.done': 'Đã lưu: {c}',
+      'req.fail': 'Không gửi được yêu cầu'
+    }
+  };
+
+  Object.assign(DICT.en, {'share.title':'Send to iPhone','share.pick':'Choose files','share.stop':'Stop sharing','share.remove':'Remove','share.empty':'No files shared.','share.hint':'Scan the existing QR, then choose Receive from PC on the iPhone. Shared files stay available until removed or the app closes.','share.picking':'Choosing files in the Windows dialog…','share.confirm':'Stop sharing all files? Active downloads will stop.','share.error':'Sharing request failed. Please try again.','share.openAgain':'The file dialog is already open — brought it to the front.','share.openHidden':'The file dialog is already open. If you cannot see it, click the AdamDrop icon in the tray.'});
+  Object.assign(DICT.vi, {'share.title':'Gửi sang iPhone','share.pick':'Chọn tệp','share.stop':'Dừng chia sẻ','share.remove':'Bỏ chia sẻ','share.empty':'Chưa có tệp được chia sẻ.','share.hint':'Quét mã QR đang có, rồi chọn Nhận từ PC trên iPhone. Tệp còn được chia sẻ cho đến khi anh bỏ chia sẻ hoặc đóng ứng dụng.','share.picking':'Đang chọn tệp trong cửa sổ Windows…','share.confirm':'Dừng chia sẻ tất cả tệp? Các lượt tải đang chạy sẽ dừng.','share.error':'Chưa thực hiện được. Anh thử lại nhé.','share.openAgain':'Cửa sổ chọn tệp đang mở — đã đưa lên trước.','share.openHidden':'Cửa sổ chọn tệp đang mở. Nếu anh không thấy, bấm biểu tượng AdamDrop ở khay.'});
+  var shareBusy = false, sharePicking = false, lastAsk = 0;
+  function renderShares() {
+    var files = state && state.sharing ? state.sharing.files : [];
+    $('shareStop').disabled = !files.length || shareBusy || sharePicking;
+    // Chọn tệp KHÔNG bị khoá khi hộp thoại đang mở: bấm lại sẽ đưa hộp thoại đang mở lên trước
+    $('sharePick').disabled = !state;
+    var signature = JSON.stringify(files) + lang;
+    if ($('shareQueue').dataset.signature === signature) return;
+    $('shareQueue').dataset.signature = signature;
+    $('shareQueue').textContent = '';
+    if (!files.length) $('shareQueue').textContent = t('share.empty');
+    files.forEach(function(f) {
+      var li = document.createElement('li'); li.style.cssText = 'display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)';
+      var name = document.createElement('span'); name.style.cssText = 'flex:1;min-width:0;overflow-wrap:anywhere'; name.textContent = f.name + ' · ' + fmt(f.size);
+      var b = document.createElement('button'); b.className = 'btn'; b.textContent = t('share.remove'); b.onclick = function(){ shareAction('remove?id=' + encodeURIComponent(f.id)); };
+      li.appendChild(name); li.appendChild(b); $('shareQueue').appendChild(li);
+    });
+  }
+  // Gửi lệnh chia sẻ; gặp 403 (app vừa khởi động lại -> mã phiên đổi) thì lấy lại mã rồi thử một lần nữa.
+  function sharePost(action, retried) {
+    var sep = action.indexOf('?') < 0 ? '?' : '&';
+    return fetch('/api/share/' + action + sep + 'lang=' + lang, {method:'POST', cache:'no-store', headers:{'X-AdamDrop-Admin':(state && state.adminToken) || ''}})
+      .then(function(r){
+        if (r.status === 403 && !retried) {
+          return fetch('/api/state', {cache:'no-store'}).then(function(x){ return x.json(); })
+            .then(function(s){ state = s; return sharePost(action, true); });
+        }
+        if (!r.ok) throw Error('http ' + r.status);
+        return r.json();
+      });
+  }
+  function shareAction(action) {
+    if (!state) return;
+    var now = Date.now();
+    if (sharePicking && (action !== 'pick' || now - lastAsk < 1200)) return;
+    lastAsk = now;
+    shareBusy = true; if (action === 'pick') sharePicking = true;
+    renderShares();
+    $('shareStatus').textContent = (action === 'pick') ? t('share.picking') : '';
+    sharePost(action, false)
+      .then(function(j){
+        if (j && j.alreadyOpen) $('shareStatus').textContent = j.focused ? t('share.openAgain') : t('share.openHidden');
+        else if (action === 'pick') $('shareStatus').textContent = '';
+        poll();
+      })
+      .catch(function(){ $('shareStatus').textContent = t('share.error'); })
+      .finally(function(){ shareBusy = false; if (action === 'pick') sharePicking = false; renderShares(); });
+  }
+  $('sharePick').onclick=function(){shareAction('pick');};
+  $('shareStop').onclick=function(){if(confirm(t('share.confirm')))shareAction('stop');};
+
+  function t(key, vars) {
+    var s = (DICT[lang] && DICT[lang][key]) || (DICT.en[key] || key);
+    if (vars) {
+      for (var k in vars) { if (vars.hasOwnProperty(k)) s = s.split('{' + k + '}').join(vars[k]); }
+    }
+    return s;
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) nodes[i].textContent = t(nodes[i].getAttribute('data-i18n'));
+    var ttl = document.querySelectorAll('[data-i18n-title]');
+    for (var j = 0; j < ttl.length; j++) ttl[j].title = t(ttl[j].getAttribute('data-i18n-title'));
+    $('langEn').className = (lang === 'en' ? 'on' : '');
+    $('langVi').className = (lang === 'vi' ? 'on' : '');
+    if ($('iLang')) $('iLang').textContent = (lang === 'en' ? 'English' : 'Tiếng Việt');
+    buildGuide(); buildAbout();
+    if (state) render(state);
+  }
+
+  function setLang(next, push) {
+    lang = (next === 'vi') ? 'vi' : 'en';
+    try { localStorage.setItem('adamdrop.lang', lang); } catch (e) {}
+    applyLang();
+    if (push) post('/api/set?lang=' + lang, true);
+  }
+
+  /* ---------------- helpers ---------------- */
+  function fmt(n) {
+    n = Number(n) || 0;
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(0) + ' KB';
+    if (n < 1073741824) return (n / 1048576).toFixed(1) + ' MB';
+    return (n / 1073741824).toFixed(2) + ' GB';
+  }
+  function spd(n) {
+    n = Number(n) || 0;
+    if (n <= 0) return '-';
+    if (n < 1024) return n.toFixed(0) + ' B/s';
+    if (n < 1048576) return (n / 1024).toFixed(0) + ' KB/s';
+    return (n / 1048576).toFixed(1) + ' MB/s';
+  }
+  function secs(s) {
+    s = Number(s) || 0;
+    if (s < 60) return t('sec.dur', { s: s.toFixed(1) });
+    var m = Math.floor(s / 60), r = Math.round(s - m * 60);
+    return t('sec.min', { m: m, s: r });
+  }
+  function netName(c) {
+    if (c === 'Private') return t('net.Private');
+    if (c === 'Public') return t('net.Public');
+    if (c === 'DomainAuthenticated' || c === 'Domain') return t('net.Domain');
+    return c || t('net.unknown');
+  }
+  function esc(x) { return (x == null ? '' : String(x)).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+  function flash(msg) {
+    var f = $('flash'); f.textContent = msg; f.classList.add('on');
+    clearTimeout(flash._t); flash._t = setTimeout(function () { f.classList.remove('on'); }, 2600);
+  }
+
+  /* ---------------- tabs ---------------- */
+  var TABS = ['ov', 'hist', 'conn', 'guide', 'about', 'set'];
+  document.querySelectorAll('.tab').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      tab = b.dataset.tab;
+      TABS.forEach(function (x) { $('tab-' + x).classList.toggle('hide', x !== tab); });
+      if (tab === 'hist') setHistPane('hist');
+      if (tab === 'ov') setTimeout(fitQr, 30);
+      try { history.replaceState(null, '', '#' + tab); } catch (e) {}
+    };
+    var h = (location.hash || '').replace('#', '').toLowerCase();
+    if (h && h === b.dataset.tab) setTimeout(function () { b.click(); }, 50);
+  });
+
+  /* ---------------- QR ---------------- */
+  function drawQr(url) {
+    qrUrl = url;
+    try {
+      var q = qrcode(0, 'M');
+      q.addData(url); q.make();
+      $('qr').innerHTML = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      fitQr();
+    } catch (e) { $('qr').innerHTML = '<div class="muted">QR error</div>'; }
+    $('qrUrl').textContent = url;
+  }
+  function fitQr() {
+    var box = $('qrBox'), qr = $('qr');
+    if (!qr || !qr.querySelector('svg')) return;
+    var vh = window.innerHeight || 900;
+    var fit = box ? box.clientWidth - 26 : 300;          // khong tran ra ngoai the
+    var size = Math.round(Math.min(vh * 0.30, 268, fit)); // QR nho, gon, o giua
+    if (size < 120) size = 120;
+    qr.style.width = size + 'px';
+    qr.style.height = size + 'px';
+  }
+  var rzT = 0;
+  window.addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(fitQr, 150); });
+
+  function drawMiniQr(id, url, noteKey) {
+    var box = $(id);
+    if (!box) return;
+    if (!url) {
+      box.innerHTML = '<div class="muted" style="font-size:12.5px; padding:12px 10px; text-align:center; line-height:1.5">' +
+        esc(t(noteKey || 'scNoFile')) + '</div>';
+      return;
+    }
+    try {
+      var q = qrcode(0, 'M');
+      q.addData(url); q.make();
+      box.innerHTML = '<div style="background:#fff; padding:10px; border-radius:12px; display:inline-block; line-height:0">' +
+        q.createSvgTag({ cellSize: 4, margin: 1 }) + '</div>' +
+        '<div class="muted" style="font-size:12.5px; margin-top:7px; text-align:center; overflow-wrap:anywhere">' +
+        esc(url) + '</div>';
+    } catch (e) { box.innerHTML = ''; }
+  }
+
+  // ma QR nho trong tab Huong dan (them phim tat vao bang chia se + phim tat tu dong)
+  function drawShortcutQr() {
+    if (!state) return;
+    drawMiniQr('qrShortcut', state.shortcutFile === false ? '' : state.shortcutUrl, 'scNoFile');
+    drawMiniQr('qrAuto', state.autoFile === false ? '' : state.autoUrl, 'autoNoFile');
+  }
+
+  /* ---------------- render ---------------- */
+  function render(s) {
+    state = s;
+    renderShares();
+    var pub = s.netWarning;
+    $('pills').innerHTML =
+      '<span class="pill ' + (s.listening ? 'ok' : '') + '">' + t('pill.port', { p: s.port }) + ' · ' + (s.listening ? t('pill.open') : t('pill.closed')) + '</span>' +
+      '<span class="pill ' + (pub ? 'warn' : 'ok') + '">' + t('pill.net') + ' <b>' + esc(netName(s.netCategory)) + '</b></span>' +
+      '<span class="pill">' + t('pill.from', { t: esc(s.startedAt) }) + '</span>';
+
+    $('netBanner').style.display = pub ? 'block' : 'none';
+    $('netBanner').innerHTML = t('banner.public', { n: esc(netName(s.netCategory)) });
+
+    $('sTodayN').textContent = s.stats.today.files; $('sTodayB').textContent = fmt(s.stats.today.bytes);
+    $('sWeekN').textContent = s.stats.week.files;   $('sWeekB').textContent = fmt(s.stats.week.bytes);
+    $('sAllN').textContent = s.stats.all.files;     $('sAllB').textContent = fmt(s.stats.all.bytes);
+
+    if (s.last) {
+      $('lastWhen').textContent = s.last.at;
+      var key = s.last.files === 1 ? 'ov.oneLine' : 'ov.fileLine';
+      $('lastLine').innerHTML = t(key, { n: s.last.files, size: fmt(s.last.bytes), sec: secs(s.last.seconds), name: esc(s.last.name) });
+      $('spMax').textContent = spd(s.last.max);
+      $('spMin').textContent = spd(s.last.min);
+      $('spAvg').textContent = spd(s.last.avg);
+    } else {
+      $('lastWhen').textContent = '';
+      $('lastLine').textContent = t('ov.none');
+      $('spMax').textContent = $('spMin').textContent = $('spAvg').textContent = '-';
+    }
+    $('sp3').classList.toggle('hide', !s.last);
+    $('spEmpty').classList.toggle('hide', !!s.last);
+
+    var lv = s.live || [];
+    $('liveCard').classList.toggle('hide', !lv.length);
+    if (lv.length) {
+      var u = lv[0], pct = u.total > 0 ? Math.floor(u.done * 100 / u.total) : 0;
+      $('liveBox').innerHTML =
+        '<div style="display:flex; gap:10px; align-items:baseline">' +
+          '<span class="mono" style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">' + esc(u.name) + '</span>' +
+          '<b>' + (u.speed > 0 ? spd(u.speed) : '…') + '</b>' +
+        '</div>' +
+        '<div class="prog"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="muted" style="margin-top:5px">' + t('ov.recv', { done: fmt(u.done), total: fmt(u.total), pct: pct }) +
+          (lv.length > 1 ? t('ov.more', { n: lv.length - 1 }) : '') + '</div>';
+    }
+
+    var r = $('recent'), hasRecent = (s.recent || []).length > 0;
+    r.innerHTML = '';
+    (s.recent || []).forEach(function (f) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span class="n">' + esc(f.name) + '</span><span class="m">' + fmt(f.size) + ' · ' + esc(String(f.time).slice(0, 5)) + '</span>';
+      li.style.cursor = 'pointer';
+      li.onclick = function () { post('/api/open?name=' + encodeURIComponent(f.name), true); };
+      r.appendChild(li);
+    });
+    $('recentHint').classList.toggle('hide', hasRecent);
+
+    if (!qrUrl || (wantHost && qrUrl !== s.hostUrl)) {
+      drawQr(wantHost ? s.hostUrl : (s.urls && s.urls.length ? s.urls[0] : s.hostUrl));
+    }
+
+    $('cListen').textContent = s.listening ? t('conn.open') : t('conn.shut');
+    $('cSince').textContent = t('conn.since', { t: s.startedAt });
+    $('cLive').textContent = (s.live || []).length;
+    $('cReq').textContent = s.requests;
+    var lb = $('liveBody'); lb.innerHTML = '';
+    if (!(s.live || []).length) {
+      lb.innerHTML = '<tr><td colspan="6" class="muted">' + t('conn.none') + '</td></tr>';
+    } else {
+      s.live.forEach(function (u) {
+        var pct = u.total > 0 ? Math.floor(u.done * 100 / u.total) : 0;
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + esc(u.name) + '</td>' +
+          '<td class="num">' + fmt(u.done) + (u.total ? ' / ' + fmt(u.total) + ' (' + pct + '%)' : '') + '</td>' +
+          '<td class="num">' + spd(u.speed) + '</td>' +
+          '<td class="num">' + secs(u.seconds) + '</td>' +
+          '<td class="mono">' + esc(u.ip) + '</td><td></td>';
+        var td = tr.lastElementChild;
+        var b = document.createElement('button');
+        b.className = 'btn danger small'; b.textContent = t('cancel');
+        b.onclick = function () { post('/api/cancel?id=' + encodeURIComponent(u.id), true); };
+        td.appendChild(b);
+        lb.appendChild(tr);
+      });
+    }
+
+    $('setDir').textContent = s.saveDir;
+    $('setKey').textContent = s.key;
+    $('iPc').textContent = s.pcName;
+    $('iPort').textContent = s.port;
+    $('iNet').textContent = netName(s.netCategory) + (pub ? ' (' + t('net.Public') + ')' : '');
+    $('iHost').textContent = s.hostUrl;
+    $('iIps').textContent = (s.urls || []).join('   ');
+    $('iLang').textContent = (lang === 'en' ? 'English' : 'Tiếng Việt');
+    $('aDir').textContent = s.saveDir;
+    $('aIni').textContent = s.iniPath;
+    $('aLog').textContent = s.logPath;
+    $('aboutVersion').textContent = t('about.version', { v: '1.0', p: s.port, t: s.startedAt });
+    $('aboutTags').innerHTML = '<span class="tag">' + t('about.tags') + '</span><span class="tag">' + esc(netName(s.netCategory)) + '</span><span class="tag">' + esc(s.pcName) + '</span>';
+    $('optAutoOpen').checked = !!s.openFolder;
+    $('optAwake').checked = !!s.keepAwake;
+    $('optAutoRun').checked = !!s.autoStart;
+
+    loadParts();
+    drawShortcutQr();
+  }
+
+  function loadParts() {
+    fetch('/api/parts').then(function (r) { return r.json(); }).then(function (j) {
+      var b = $('partsBody'); b.innerHTML = '';
+      var parts = j.parts || [];
+      $('cParts').textContent = parts.length;
+      if (!parts.length) { b.innerHTML = '<tr><td colspan="4" class="muted">' + t('conn.pEmpty') + '</td></tr>'; return; }
+      parts.forEach(function (p) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td class="mono">' + esc(p.id) + '</td><td class="num">' + fmt(p.bytes) + '</td><td>' + esc(p.time) + '</td><td></td>';
+        var btn = document.createElement('button');
+        btn.className = 'btn danger small'; btn.textContent = t('remove');
+        btn.onclick = function () { fetch('/api/parts?clear=' + encodeURIComponent(p.id)).then(loadParts); };
+        tr.lastElementChild.appendChild(btn);
+        b.appendChild(tr);
+      });
+    }).catch(function () {});
+  }
+
+  function loadHist() {
+    var d = $('days').value;
+    fetch('/api/history?days=' + d).then(function (r) { return r.json(); }).then(function (j) {
+      var b = $('histBody'); b.innerHTML = '';
+      if (!j.sessions || !j.sessions.length) {
+        b.innerHTML = '<tr><td colspan="9" class="muted">' + t('hist.empty') + '</td></tr>'; return;
+      }
+      j.sessions.forEach(function (s) {
+        var tr = document.createElement('tr');
+        var full = s.dir ? s.dir + '\\' + s.name : '';
+        tr.innerHTML = '<td>' + esc(s.end) + '</td>' +
+          '<td class="num">' + s.files + '</td>' +
+          '<td class="num">' + fmt(s.bytes) + '</td>' +
+          '<td class="num">' + secs(s.seconds) + '</td>' +
+          '<td class="num">' + spd(s.max) + '</td>' +
+          '<td class="num">' + spd(s.min) + '</td>' +
+          '<td class="num">' + spd(s.avg) + '</td>' +
+          '<td class="mono">' + esc(s.name) + '</td>' +
+          '<td class="mono path" title="' + esc(full) + '">' + (full ? esc(full) : '<span class="muted">—</span>') + '</td>';
+        b.appendChild(tr);
+      });
+    }).catch(function () {});
+  }
+
+  function setHistPane(p) {
+    var isLog = (p === 'log');
+    $('paneHist').classList.toggle('hide', isLog);
+    $('paneLog').classList.toggle('hide', !isLog);
+    $('histCtl').classList.toggle('hide', isLog);
+    $('logCtl').classList.toggle('hide', !isLog);
+    $('segHist').classList.toggle('on', !isLog);
+    $('segLog').classList.toggle('on', isLog);
+    if (isLog) loadLog(); else loadHist();
+  }
+  function loadLog() {
+    fetch('/api/log').then(function (r) { return r.text(); }).then(function (x) {
+      $('log').textContent = x || '(empty)';
+    }).catch(function () { $('log').textContent = t('log.fail'); });
+  }
+
+  function post(url, quiet) {
+    fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok === false && j.message && !quiet) flash(j.message);
+      else if (j && j.changed && j.changed.length) flash(t('acted.done', { c: j.changed.join(', ') }));
+      setTimeout(poll, 250);
+    }).catch(function () { flash(t('req.fail')); });
+  }
+
+  /* ---------------- guide & about ---------------- */
+  function buildGuide() {
+    var g = {
+      en: [
+        { h: 'What AdamDrop does', b:
+          '<p>AdamDrop is a small app on your Windows PC. It opens a private port on your local network, shows a QR code, and lets the iPhone send photos and videos straight into a folder on the PC. Nothing goes to the internet and there is no account to create.</p>' +
+          '<div class="okbox">Sending over the local network is much faster than uploading to a cloud service, and files stay on your own disk.</div>' +
+          '<p>It works in both directions: the iPhone can send to this PC, and this PC can send to the iPhone.</p>' },
+        { h: 'Send from this PC to the iPhone', b:
+          '<p>Files can go the other way too: pick them here, then open them on the iPhone. Nothing is shared until you choose it.</p>' +
+          '<ol><li>In <b>Overview</b>, open the <b>Send to iPhone</b> box and tap <b>Choose files</b>. The Windows picker opens on this PC screen, so do this while sitting at the PC. Several files at once are fine.</li>' +
+          '<li>Every chosen file appears in the list with its size. <b>Remove</b> takes one file out; <b>Stop sharing</b> takes all of them out and also cuts any transfer that is still running.</li>' +
+          '<li>On the iPhone scan the same QR code as always, then choose <b>Receive from PC</b> at the top of the page. The shared files appear there; if you added or removed something on the PC, tap <b>Refresh</b>.</li>' +
+          '<li>Tap <b>Save to Files</b> to download the original. It lands in the Downloads location set in Safari, which may be iCloud Drive.</li></ol>' +
+          '<div class="okbox"><b>Photos and videos have a second button:</b> <b>Save to Photos</b> opens the picture or clip right here in the page. Then <b>touch and hold</b> the image and choose <b>Save to Photos</b> (or Add to Photos). For a video, tap Safari\u2019s <b>Share</b> button and choose <b>Save Video</b>. A web page is not allowed to write to the Photos library on its own, so that last touch is yours. If it will not save, download to Files first and share from there. This button deliberately does not open a new tab, because iOS Safari tends to drop the file into Files instead of showing it.</div>' +
+          '<div class="warnbox">Files stay available until you remove them or close the app, and closing the app clears the list. Anyone who has the current QR code or key can download what is shared on the same network, so stop sharing when you are done. Removing a file does not delete it from this PC, and copies already downloaded cannot be taken back.</div>' },
+        { h: 'One tap from the PC into the Photos library (shortcut)', b:
+          '<p>A web page is never allowed to write into the iPhone Photos library - that is Apple\u2019s rule, and it is why every picture otherwise needs a touch of its own. The <b>Shortcuts</b> app is a system app, so it may. Build this once and one tap pulls the whole shared batch into Photos.</p>' +
+          '<ol><li>On the iPhone open the AdamDrop page, mode <b>Receive from PC</b>, section <b>⚡ One tap: get the whole batch into the Photos library (shortcut)</b>, and tap <b>Copy list address</b> (it ends with <span class="k">/list?k=...</span>).</li>' +
+          '<li>In <b>Shortcuts</b> tap <b>+</b> and name it <b>AdamDrop-get</b>.</li>' +
+          '<li>Add <b>Get Contents of URL</b>, paste the address, leave the method as <b>GET</b>.</li>' +
+          '<li>Add <b>Split Text</b> &rsaquo; Split &rsaquo; <b>New Lines</b>.</li>' +
+          '<li>Add <b>Repeat with Each</b> over the <b>Split Text</b> result.</li>' +
+          '<li>Inside the loop add <b>Get Contents of URL</b>: leave the <b>URL</b> box empty, tap it and insert the <b>Repeat Item</b> variable.</li>' +
+          '<li>Inside the loop add <b>Save to Photo Album</b>, then <b>End Repeat</b>.</li></ol>' +
+          '<div class="okbox">Run it after sharing files on the PC: every shared photo and video goes into the library in one go, instead of touching each picture. Want them in Files instead? Replace the last action with <b>Save to Files</b>.</div>' +
+          '<div class="warnbox">That address holds your key, so keep it to yourself. The shortcut needs the PC app running and something shared; an empty list simply does nothing.</div>' },
+        { h: 'Send from the iPhone (Safari, fastest way)', b:
+          '<ol><li>Open <b>Camera</b> on the iPhone and point it at the QR code in Overview.</li>' +
+          '<li>Tap the yellow link that appears. Safari opens the AdamDrop send page.</li>' +
+          '<li>Tap <span class="k">Add photos &amp; videos</span>, pick what you want, and confirm.</li>' +
+          '<li>Keep Safari in the foreground with the screen on until the progress finishes. iOS pauses uploads in the background.</li></ol>' +
+          '<p><b>Resume:</b> this page sends a file in 8 MB pieces. If Wi-Fi drops or you close Safari, open the page again, pick the same file, and it continues from the byte it stopped at. The PC holds unfinished files for 24 hours (see Connections).</p>' },
+        { h: 'One-tap send from the Share Sheet (like AirDrop)', b:
+          '<p>Set up once, then to send: pick a photo in <b>Photos</b> &rsaquo; tap <b>Share</b> &rsaquo; tap <b>AdamDrop</b>. The file goes straight to this PC, no need to open the send page again.</p><div class="okbox"><b>Main path: build the shortcut by hand (7 steps).</b> iOS 26 blocks shortcut files that Apple has not signed, so the two gold buttons at the end of this section may fail - it is not a mistake on your side. The hand-built one always works. The pictures below are real screenshots from an iPhone: the <b>gold circle</b> marks what to tap, and the <b>number on the picture matches the number in the caption</b>.</div><h4 class="gstep">Step 1 - Turn the sharing switch on</h4><img class="gimg" src="/guide/buoc1-cong-tac.png" alt="Private Sharing switch turned on"><ol class="gnum"><li>The <b>Private Sharing</b> switch (older iOS calls it <b>Allow Untrusted Shortcuts</b>) must be <b>ON</b>. Path: <b>Shortcuts</b> app &rsaquo; tap your <b>picture in the top right corner</b> &rsaquo; <b>Settings</b>. The switch only appears after you have run some shortcut once.</li></ol><h4 class="gstep">Step 2 - Create a new shortcut and search &quot;Repeat&quot;</h4><img class="gimg" src="/guide/buoc2-tim-kiem.png" alt="Action search box"><ol class="gnum"><li>Tap the <b>+</b> in the <b>top right corner</b> (never the small + next to a folder name, that only creates an empty folder), name it <b>AdamDrop</b>, then tap the <b>action search box</b> and type <span class="k">Repeat</span> &rsaquo; pick <b>Repeat with Each</b>.</li></ol><h4 class="gstep">Step 3 - Let the loop read the photos you send</h4><img class="gimg" src="/guide/buoc3-vong-lap.png" alt="Repeat loop and the Item variable"><ol class="gnum"><li>The loop is now in the shortcut, leave that line alone.</li><li>Tap the <b>blue &quot;Item&quot; chip</b> &rsaquo; pick the variable <b>Shortcut Input</b> (5th line in the variable list).</li></ol><h4 class="gstep">Step 4 - Add the sending action inside the loop</h4><img class="gimg" src="/guide/buoc4-lay-noi-dung.png" alt="Get Contents of URL row"><ol class="gnum"><li>Tap <b>+</b> to add an action, type <span class="k">URL</span> and pick the row <b>Get Contents of URL</b>.</li></ol><p class="muted">If it lands outside the loop: hold it for about a second &rsaquo; tap <b>Move</b> &rsaquo; put it above the &quot;End Repeat&quot; line so it sits inside the loop.</p><h4 class="gstep">Step 5 - Change the method to POST</h4><img class="gimg" src="/guide/buoc5-post.png" alt="POST picker"><ol class="gnum"><li>On the <b>Method</b> row tap <b>GET</b>, then choose <b>POST</b> in the list that appears.</li></ol><h4 class="gstep">Step 6 - Pick the file to send and paste the address</h4><img class="gimg" src="/guide/buoc6-tep.png" alt="Request Body File, Repeat Item, address"><ol class="gnum"><li>Tap the <b>URL</b> field. It usually already holds a <b>blue variable named &quot;URL&quot;</b>: tap that variable &rsaquo; tap the red <b>Delete Variable</b> to empty the field &rsaquo; then <b>hold the empty field</b> &rsaquo; <b>Paste</b> the address (copy it from the box at the end of this section, using <b>Copy</b> on the phone page).</li><li>The <b>Request Body</b> row defaults to <b>JSON</b>: tap <b>JSON</b> &rsaquo; choose <b>File</b>.</li><li>Tap the <b>File</b> field that appears &rsaquo; pick the variable <b>Repeat Item</b> (some versions show &quot;Repeat Item&quot;) - same thing.</li></ol><h4 class="gstep">Step 7 - Turn on &quot;In Share Sheet&quot;</h4><img class="gimg" src="/guide/buoc7-bang-chia-se.png" alt="In Share Sheet switch"><ol class="gnum"><li>Tap the <b>&#9432;</b> button in the bottom bar &rsaquo; turn on the <b>In Share Sheet</b> switch &rsaquo; tap the <b>tick</b> in the top right to save. iOS 26 has <b>no</b> Images/Files/Media row to tick, nothing to look for.</li></ol><h4 class="gstep">Done - try a send</h4><p>Open <b>Photos</b> &rsaquo; pick one photo &rsaquo; <b>Share</b> &rsaquo; swipe the <b>Shortcuts</b> row and find <b>AdamDrop</b> (if it is not there, tap <b>Edit Actions&hellip;</b> at the bottom of the share sheet and turn AdamDrop on). The first time the iPhone asks two questions: choose <b>Always Allow</b> and allow <b>Local Network</b>.</p><h4 class="gstep">A correct shortcut looks like this</h4><img class="gimg" src="/guide/ket-qua.png" alt="Finished AdamDrop shortcut"><ol class="gnum"><li>Method <b>POST</b> (blue word on the Method row).</li><li>The <b>Request Body</b> row is <b>File</b>, and the File field holds the variable <b>Repeat Item</b>.</li><li><b>End Repeat</b> at the bottom: the sending action sits inside the loop.</li></ol><div class="okbox"><b>Secondary path: one tap install (Apple may block it).</b> Scan the code below with the iPhone Camera and tap the gold button <b>Add AdamDrop in one tap</b> &rsaquo; <b>Add Shortcut</b>. If the iPhone answers <b>&quot;Cannot Import - the provided shortcut URL is invalid&quot;</b> or <b>&quot;Cannot Open Shortcut - importing unsigned shortcut files is not supported&quot;</b>, Apple is blocking this path: go back to the 7 steps above. A Windows PC cannot sign a shortcut file, only a Mac can, so this is a rule set by Apple and not a setup mistake.</div><div class="qrmini" id="qrShortcut"></div><div class="warnbox">This shortcut file contains your PC name and connection key. Do not give it to anyone else. If you change the key in the Settings tab, scan this code again and add the shortcut once more.</div><div class="warnbox">The share sheet sends one file per run, so it cannot resume after a drop like the Safari page does. Photos and short videos are fine; very long videos are better sent from the Safari page.</div>' },
+        { h: 'Automatic: photos come home on their own (Wi-Fi)', b:
+          '<p>Set this up once and you never touch the phone again. Every time the iPhone joins your home Wi-Fi, the day\u2019s new photos and videos go to this PC on their own. Files that already arrived are skipped, so nothing piles up as (1)(2)(3).</p>' +
+          '<ol><li>Scan the QR below with the iPhone <b>Camera</b> (or on the phone page open the section <b>🔁 Automatic: photos come home on their own (Wi-Fi)</b> and tap the gold <b>Add the automatic shortcut in 1 tap</b>) and install the shortcut named <b>AdamDrop-auto</b>. Same one-time sharing setting as above (<b>Allow Untrusted Shortcuts</b> on older iOS, <b>Private Sharing</b> on iOS 26).</li>' +
+          '<li>Open <b>Shortcuts ▸ Automation ▸ + ▸ Wi-Fi</b> and tick your home network. Tick both bands (2.4G and 5G) if you have them, or choose <b>Any Network</b>.</li>' +
+          '<li>Choose <b>Run Immediately</b> (turn <b>Ask Before Running</b> off) ▸ <b>Next</b> ▸ search <b>AdamDrop-auto</b> ▸ tap it ▸ <b>Done</b>.</li>' +
+          '<li>Test it: switch Wi-Fi off and back on. A notification appears and the new photos show up in the Overview list here.</li></ol>' +
+          '<div class="qrmini" id="qrAuto"></div>' +
+          '<div class="warnbox">Each run sends only files <b>taken today</b>, so keep the iPhone connecting to that network at least once a day. The file holds your connection key, keep it to yourself; if you change the key, scan again and add the shortcut once more.</div>' },
+        { h: 'Where files land, and how to change it', b:
+          '<p>Files go to the folder shown in Settings. Every file keeps its original name and date. If a name already exists, AdamDrop adds <span class="k">(1)</span>, <span class="k">(2)</span> and never overwrites.</p>' +
+          '<p>To change the folder: Settings ▸ <b>Choose a folder on this PC</b>, or right click the tray icon ▸ Change receive folder. The Windows picker opens on the PC screen, so do this while sitting at the PC.</p>' },
+        { h: 'The tray icon', b:
+          '<ul><li><b>Open dashboard:</b> left double click the gold icon, or right click and choose it.</li>' +
+          '<li><b>Change folder, open log, start with Windows, keep awake:</b> all in the right click menu.</li>' +
+          '<li><b>Exit:</b> stops receiving until the next sign in, or until you start it again.</li></ul>' },
+        { h: 'Speed you can expect', b:
+          '<table><tr><th>What</th><th>Reality</th></tr>' +
+          '<tr><td>Same Wi-Fi network</td><td>Usually 8 to 40 MB/s, depends on the router and the phone</td></tr>' +
+          '<tr><td>Many small photos</td><td>Slower than one big file, because each file is a separate request</td></tr>' +
+          '<tr><td>One long video</td><td>Fastest case, keep the screen on</td></tr>' +
+          '<tr><td>Files over 2 GB</td><td>Safari can drop them; send in smaller groups</td></tr>' +
+          '<tr><td>Wired Ethernet</td><td>The PC side is never the bottleneck, Wi-Fi is</td></tr></table>' +
+          '<p>The Overview tab shows peak, lowest and average speed of the last share, and History keeps the numbers for every past share.</p>' },
+        { h: 'When something goes wrong', b:
+          '<ul>' +
+          '<li><b>iPhone shows an error, nothing arrives:</b> check you are on the same Wi-Fi network and that the link still has the current key (Settings ▸ Connection key).</li>' +
+          '<li><b>403 in the phone page:</b> the key is wrong or out of date. Scan the QR code again.</li>' +
+          '<li><b>Receive from PC shows no files:</b> nothing is shared right now, or you stopped sharing. Choose files on the PC again, then tap Refresh on the phone.</li>' +
+          '<li><b>A shared file errors out instead of downloading:</b> that file was moved, renamed or deleted on the PC, or sharing was stopped while it was downloading. Choose it again on the PC.</li>' +
+          '<li><b>429 or a one minute block:</b> too many wrong keys from that device. Wait a minute.</li>' +
+          '<li><b>Transfer stops at 90 percent or restarts:</b> the iPhone locked its screen or left Wi-Fi. Open the page again and pick the same file, it resumes.</li>' +
+          '<li><b>Disk is full:</b> the PC shows a balloon and writes it to the log. The phone may only report a network error, because Windows cannot answer before it reads the whole request. Free some space and send again, the file is still in Photos.</li>' +
+          '<li><b>Port already in use:</b> another program took port 8765. Run install.bat again, or change the port in adamdrop.ini and restart.</li>' +
+          '<li><b>Public network warning:</b> on a public network the port is open to everyone on that network, and the key is the only lock. Prefer Private networks.</li>' +
+          '<li><b>Nothing works after a Windows update:</b> run install.bat as administrator once, it restores the firewall rule and the port reservation.</li>' +
+          '</ul>' },
+        { h: 'Security and privacy', b:
+          '<ul><li>Files move only inside your own network. AdamDrop never uploads anything anywhere.</li>' +
+          '<li>Every request must carry the connection key. The key is never written to the log.</li>' +
+          '<li>The dashboard is reachable from this PC only, not from the network.</li>' +
+          '<li>20 wrong keys in a minute block that device for one minute.</li>' +
+          '<li>The app does not run as administrator, and it does not touch any other folder than the save folder you choose.</li>' +
+          '<li>Sharing to the iPhone covers only the files you pick in the Windows dialog, one by one. No folder of this PC is ever exposed, and the phone never learns the path of a file.</li></ul>' },
+        { h: 'Files this app keeps', b:
+          '<ul><li><span class="k">adamdrop.ini</span> settings, port, key, save folder</li>' +
+          '<li><span class="k">adamdrop.log</span> last 200 events, rotates automatically</li>' +
+          '<li><span class="k">history.tsv</span> one line per share, up to 2000 shares</li>' +
+          '<li><span class="k">recent.tsv</span> last 30 received files for the Overview list</li></ul>' +
+          '<p>To remove the app: run <span class="k">uninstall.bat</span>, then delete this folder. Your received files stay where they are.</p>' }
+      ],
+      vi: [
+        { h: 'AdamDrop làm được gì', b:
+          '<p>AdamDrop là ứng dụng nhỏ chạy trên máy tính Windows. Nó mở một cổng riêng trong mạng nhà, hiện mã QR, và cho iPhone gửi thẳng ảnh, video vào một thư mục trên máy tính. Không có dữ liệu nào đi ra internet, không cần tạo tài khoản.</p>' +
+          '<div class="okbox">Gửi trong mạng nhà nhanh hơn nhiều so với tải lên dịch vụ đám mây, và tệp nằm lại trên đĩa của anh.</div>' +
+          '<p>Ứng dụng chạy được cả hai chiều: iPhone gửi sang máy tính này, và máy tính này gửi sang iPhone.</p>' },
+        { h: 'Gửi từ máy tính sang iPhone', b:
+          '<p>Chiều ngược lại cũng có: chọn tệp ngay trên máy tính rồi mở trên iPhone. Chưa chọn thì chưa có tệp nào được chia sẻ.</p>' +
+          '<ol><li>Ở tab <b>Tổng quan</b>, mở ô <b>Gửi sang iPhone</b> rồi bấm <b>Chọn tệp</b>. Hộp thoại Windows hiện trên màn hình máy tính nên cần ngồi tại máy. Chọn được nhiều tệp một lúc.</li>' +
+          '<li>Tệp đã chọn hiện thành danh sách kèm dung lượng. <b>Bỏ chia sẻ</b> gỡ một tệp; <b>Dừng chia sẻ</b> gỡ tất cả và cắt luôn lượt tải còn đang chạy.</li>' +
+          '<li>Trên iPhone quét đúng mã QR như mọi khi, rồi chọn <b>Nhận từ PC</b> ở đầu trang. Danh sách tệp hiện ra ở đó; thêm hoặc bớt tệp trên máy tính thì bấm <b>Tải lại danh sách</b>.</li>' +
+          '<li>Bấm <b>Lưu vào Tệp</b> để tải bản gốc. Tệp về vị trí Tải về đã đặt trong Safari, có thể là iCloud Drive.</li></ol>' +
+          '<div class="okbox"><b>Ảnh và video có thêm nút thứ hai:</b> <b>Lưu vào Ảnh</b> mở ảnh hoặc video ngay trong trang này. Sau đó <b>nhấn giữ</b> vào ảnh rồi chọn <b>Lưu vào Ảnh</b> (hoặc Thêm vào Ảnh). Với video: bấm nút <b>Chia sẻ</b> của Safari rồi chọn <b>Lưu video</b>. Trang web không được phép tự ghi vào thư viện Ảnh, nên bước cuối là do anh bấm. Nếu không lưu được thì tải về Tệp rồi chia sẻ từ đó. Nút này cố ý KHÔNG mở tab mới, vì Safari trên iOS hay đẩy tệp vào Tệp thay vì hiện ảnh.</div>' +
+          '<div class="warnbox">Tệp còn được chia sẻ cho tới khi anh bỏ chia sẻ hoặc đóng ứng dụng; đóng ứng dụng là danh sách xoá hết. Ai có mã QR hoặc mã khoá hiện tại đều tải được những tệp đang chia sẻ trong cùng mạng, nên xong việc thì dừng chia sẻ. Bỏ chia sẻ không xoá tệp trên máy tính, và không thu hồi được bản đã tải về.</div>' },
+        { h: 'Một chạm đưa ảnh từ PC vào thư viện Ảnh (Phím tắt)', b:
+          '<p>Trang web không bao giờ được phép ghi vào thư viện Ảnh của iPhone - đó là luật của Apple, và cũng là lý do mỗi ảnh phải chạm một lần. App <b>Phím tắt</b> là app hệ thống nên được phép. Dựng một lần, sau đó một chạm là cả loạt ảnh vào Ảnh.</p>' +
+          '<ol><li>Trên iPhone mở trang AdamDrop, chọn <b>Nhận từ PC</b>, mở mục <b>⚡ Một chạm: lấy cả loạt ảnh vào thẳng thư viện Ảnh (Phím tắt)</b> rồi bấm <b>Sao chép địa chỉ danh sách</b> (địa chỉ có đuôi <span class="k">/list?k=...</span>).</li>' +
+          '<li>Mở app <b>Phím tắt</b>, bấm <b>+</b>, đặt tên <b>AdamDrop-nhan</b>.</li>' +
+          '<li>Thêm tác vụ <b>Lấy nội dung của URL</b>, dán địa chỉ vào ô <b>URL</b>, để nguyên phương thức <b>GET</b>.</li>' +
+          '<li>Thêm <b>Tách văn bản</b> &rsaquo; Tách &rsaquo; <b>Dòng mới</b>.</li>' +
+          '<li>Thêm <b>Lặp lại với từng mục trong</b> và chọn kết quả của <b>Tách văn bản</b>.</li>' +
+          '<li>Trong vòng lặp, thêm <b>Lấy nội dung của URL</b>: để trống ô <b>URL</b>, bấm vào ô đó rồi chèn biến <b>Lặp lại mục</b>.</li>' +
+          '<li>Vẫn trong vòng lặp, thêm <b>Lưu vào Album ảnh</b>, rồi thêm <b>Kết thúc lặp lại</b>.</li></ol>' +
+          '<div class="okbox">Chạy phím tắt sau khi đã chọn tệp trên máy tính: toàn bộ ảnh/video đang chia sẻ vào thẳng thư viện Ảnh trong một lần, không phải chạm từng ảnh. Muốn lưu vào Tệp thì chỉ cần đổi tác vụ cuối thành <b>Lưu vào Tệp</b>.</div>' +
+          '<div class="warnbox">Địa chỉ đó chứa mã khoá của anh, đừng đưa cho người khác. Phím tắt cần app trên máy tính đang chạy và đang có tệp được chia sẻ; danh sách trống thì chạy xong sẽ không có gì.</div>' },
+        { h: 'Gửi từ iPhone (Safari, cách nhanh nhất)', b:
+          '<ol><li>Mở <b>Camera</b> trên iPhone, chĩa vào mã QR ở tab Tổng quan.</li>' +
+          '<li>Bấm liên kết vàng vừa hiện. Safari mở trang gửi của AdamDrop.</li>' +
+          '<li>Bấm <span class="k">Thêm ảnh và video</span>, chọn tệp rồi xác nhận.</li>' +
+          '<li>Giữ Safari ở tiền cảnh và màn hình sáng cho tới khi chạy xong. iOS tạm dừng tải khi ứng dụng xuống nền.</li></ol>' +
+          '<p><b>Gửi tiếp:</b> trang này chia tệp thành từng đoạn 8 MB. Nếu Wi-Fi đứt hoặc anh đóng Safari, mở lại trang, chọn đúng tệp đó, nó chạy tiếp từ đúng chỗ dừng. Máy tính giữ tệp dở 24 giờ (xem tab Kết nối).</p>' },
+        { h: 'Gửi một chạm từ bảng Chia sẻ (như AirDrop)', b:
+          '<p>Thiết lập một lần, sau đó muốn gửi: chọn ảnh trong <b>Ảnh</b> &rsaquo; bấm <b>Chia sẻ</b> &rsaquo; bấm <b>AdamDrop</b>. Tệp sang thẳng máy tính này, không phải mở trang gửi nữa.</p><div class="okbox"><b>Đường chính: tự dựng phím tắt bằng tay (7 bước).</b> iOS 26 chặn tệp phím tắt chưa được Apple ký, nên hai nút vàng ở cuối mục này có thể báo lỗi - không phải anh làm sai. Tự dựng thì luôn chạy được. Ảnh dưới là màn hình thật trên iPhone, <b>vòng tròn vàng</b> là chỗ cần bấm, <b>số trên ảnh khớp với số trong chú thích</b>.</div><h4 class="gstep">Bước 1 - Bật công tắc chia sẻ</h4><img class="gimg" src="/guide/buoc1-cong-tac.png" alt="Công tắc Chia sẻ riêng tư đang bật"><ol class="gnum"><li>Công tắc <b>Chia sẻ riêng tư</b> (iOS cũ gọi là <b>Cho phép phím tắt không tin cậy</b>) phải đang <b>BẬT</b>. Đường vào: app <b>Phím tắt</b> &rsaquo; bấm <b>ảnh đại diện ở góc trên bên phải</b> &rsaquo; <b>Cài đặt</b>. Công tắc chỉ hiện sau khi anh đã chạy một phím tắt bất kỳ.</li></ol><h4 class="gstep">Bước 2 - Mở phím tắt mới và gõ tìm &quot;Lặp&quot;</h4><img class="gimg" src="/guide/buoc2-tim-kiem.png" alt="Ô Tìm kiếm tác vụ"><ol class="gnum"><li>Bấm nút <b>+</b> ở <b>góc trên bên phải</b> (đừng bấm dấu + nhỏ cạnh tên thư mục, chỗ đó chỉ tạo thư mục rỗng), đặt tên <b>AdamDrop</b>, rồi bấm vào <b>ô tìm kiếm tác vụ</b> và gõ <span class="k">Lap</span> &rsaquo; chọn <b>Lặp lại với mỗi mục</b>.</li></ol><h4 class="gstep">Bước 3 - Cho vòng lặp đọc ảnh anh gửi</h4><img class="gimg" src="/guide/buoc3-vong-lap.png" alt="Vòng lặp và ô biến Mục"><ol class="gnum"><li>Vòng lặp đã nằm trong phím tắt, giữ nguyên dòng này.</li><li>Bấm vào <b>ô xanh &quot;Mục&quot;</b> &rsaquo; chọn biến <b>Đầu vào phím tắt</b> (dòng thứ 5 trong danh sách biến).</li></ol><h4 class="gstep">Bước 4 - Thêm tác vụ gửi vào trong vòng lặp</h4><img class="gimg" src="/guide/buoc4-lay-noi-dung.png" alt="Dòng Lấy nội dung của URL"><ol class="gnum"><li>Bấm <b>+</b> thêm tác vụ, gõ <span class="k">Url</span> rồi chọn đúng dòng <b>Lấy nội dung của URL</b>.</li></ol><p class="muted">Nếu nó rơi ra ngoài vòng lặp: giữ ~1 giây vào tác vụ &rsaquo; bấm <b>Di chuyển</b> &rsaquo; đưa lên trên dòng &quot;Kết thúc lặp lại&quot; cho nó thụt vào trong khung vòng lặp.</p><h4 class="gstep">Bước 5 - Đổi phương thức sang POST</h4><img class="gimg" src="/guide/buoc5-post.png" alt="Bảng chọn POST"><ol class="gnum"><li>Ở dòng <b>Phương thức</b>, bấm chữ <b>GET</b> rồi chọn <b>POST</b> trong bảng vừa hiện ra.</li></ol><h4 class="gstep">Bước 6 - Chọn tệp gửi đi và dán địa chỉ</h4><img class="gimg" src="/guide/buoc6-tep.png" alt="Yêu cầu nội dung Tệp, Lặp lại mục, địa chỉ"><ol class="gnum"><li>Bấm vào ô <b>URL</b>. Trong ô thường đã dính sẵn một <b>biến xanh tên &quot;URL&quot;</b>: bấm vào biến đó &rsaquo; bấm dòng đỏ <b>Xóa biến</b> cho ô trống &rsaquo; rồi <b>giữ vào ô trống</b> &rsaquo; <b>Dán</b> địa chỉ (chép ở ô cuối mục này bằng nút <b>Sao chép</b> trên trang gửi).</li><li>Ở dòng <b>Yêu cầu nội dung</b> iOS mặc định để <b>JSON</b>: bấm chữ <b>JSON</b> &rsaquo; chọn <b>Tệp</b>.</li><li>Bấm vào ô <b>Tệp</b> vừa hiện ra &rsaquo; chọn biến <b>Lặp lại mục</b> (bản khác ghi &quot;Mục lặp lại&quot; - cùng một thứ).</li></ol><h4 class="gstep">Bước 7 - Bật &quot;Trong Bảng chia sẻ&quot;</h4><img class="gimg" src="/guide/buoc7-bang-chia-se.png" alt="Công tắc Trong Bảng chia sẻ"><ol class="gnum"><li>Bấm nút <b>&#9432;</b> ở thanh dưới cùng &rsaquo; bật công tắc <b>Trong Bảng chia sẻ</b> &rsaquo; bấm <b>dấu tích</b> ở góc phải trên để lưu. iOS 26 <b>không có</b> dòng chọn loại Ảnh/Tệp/Phương tiện, không cần tìm.</li></ol><h4 class="gstep">Xong - gửi thử</h4><p>Mở <b>Ảnh</b> &rsaquo; chọn một tấm &rsaquo; <b>Chia sẻ</b> &rsaquo; kéo hàng <b>Phím tắt</b> và tìm <b>AdamDrop</b> (chưa thấy thì bấm <b>Sửa thao tác&hellip;</b> ở cuối bảng chia sẻ rồi bật AdamDrop lên). Lần đầu iPhone hỏi hai câu: chọn <b>Luôn cho phép</b> và cho phép <b>Mạng cục bộ</b>.</p><h4 class="gstep">Phím tắt đúng sẽ trông như thế này</h4><img class="gimg" src="/guide/ket-qua.png" alt="Phím tắt AdamDrop hoàn chỉnh"><ol class="gnum"><li>Phương thức <b>POST</b> (chữ xanh ở dòng Phương thức).</li><li>Dòng <b>Yêu cầu nội dung</b> để <b>Tệp</b>, và ô Tệp là biến <b>Lặp lại mục</b>.</li><li><b>Kết thúc lặp lại</b> nằm dưới cùng: tác vụ gửi đã ở trong vòng lặp.</li></ol><div class="okbox"><b>Đường phụ: cài bằng 1 chạm (có thể bị Apple chặn).</b> Quét mã dưới đây bằng Camera trên iPhone rồi bấm nút vàng <b>Thêm AdamDrop bằng 1 chạm</b> &rsaquo; <b>Thêm phím tắt</b>. Nếu iPhone báo <b>&quot;Không thể nhập - URL phím tắt đã cung cấp không hợp lệ&quot;</b> hoặc <b>&quot;Không thể mở phím tắt - Việc nhập tệp phím tắt chưa xác nhận không được hỗ trợ&quot;</b> thì đường này bị Apple chặn: quay lại 7 bước ở trên. Máy Windows không ký được tệp phím tắt, chỉ máy Mac mới ký được, nên đây là giới hạn của Apple chứ không phải lỗi cài đặt.</div><div class="qrmini" id="qrShortcut"></div><div class="warnbox">Tệp phím tắt này chứa tên máy tính và mã khoá kết nối. Đừng đưa cho người khác. Nếu anh đổi mã khoá trong tab Cài đặt, quét lại mã này và thêm phím tắt một lần nữa.</div><div class="warnbox">Bảng chia sẻ gửi mỗi tệp trong một lần nên không gửi tiếp được khi đứt kết nối như trang Safari. Ảnh và video ngắn thì ổn; video rất dài nên dùng trang Safari.</div>' },
+        { h: 'Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)', b:
+          '<p>Dựng một lần rồi không phải đụng tới điện thoại nữa. Mỗi lần iPhone nối Wi-Fi nhà, ảnh và video mới trong ngày tự về máy tính này. Tệp đã nhận trước đó được bỏ qua, không sinh ra bản (1)(2)(3).</p>' +
+          '<ol><li>Quét mã QR dưới đây bằng <b>Camera</b> trên iPhone (hoặc mở trang gửi trên điện thoại, vào mục <b>🔁 Tự động: về nhà là ảnh tự về máy tính (Wi-Fi)</b> và bấm nút vàng <b>Thêm phím tắt tự động bằng 1 chạm</b>), rồi cài phím tắt tên <b>AdamDrop-auto</b>. Vẫn cần bật một lần công tắc chia sẻ như trên (<b>Cho phép phím tắt không tin cậy</b> ở iOS cũ, <b>Chia sẻ riêng tư</b> ở iOS 26).</li>' +
+          '<li>Mở <b>Phím tắt ▸ Tự động hoá ▸ +  ▸ Wi-Fi</b>, tích mạng Wi-Fi nhà. Có cả 2.4G và 5G thì tích cả hai, hoặc chọn <b>Mọi mạng</b>.</li>' +
+          '<li>Chọn <b>Chạy ngay</b> (tắt <b>Hỏi trước khi chạy</b>) ▸ <b>Tiếp</b> ▸ tìm <b>AdamDrop-auto</b> ▸ bấm vào ▸ <b>Xong</b>.</li>' +
+          '<li>Thử: tắt Wi-Fi rồi bật lại. iPhone báo một thông báo, ảnh mới hiện trong danh sách ở tab Tổng quan.</li></ol>' +
+          '<div class="qrmini" id="qrAuto"></div>' +
+          '<div class="warnbox">Mỗi lần chạy chỉ gửi tệp <b>chụp trong ngày</b>, nên nhớ cho iPhone nối mạng đó ít nhất một lần mỗi ngày. Tệp chứa mã khoá kết nối, đừng đưa cho người khác; đổi mã khoá thì quét lại và thêm phím tắt một lần nữa.</div>' },
+        { h: 'Tệp lưu ở đâu và đổi chỗ lưu', b:
+          '<p>Tệp vào đúng thư mục hiện trong tab Cài đặt. Mỗi tệp giữ nguyên tên và ngày gốc. Nếu tên đã tồn tại, AdamDrop thêm <span class="k">(1)</span>, <span class="k">(2)</span> và không bao giờ ghi đè.</p>' +
+          '<p>Đổi thư mục: tab Cài đặt ▸ <b>Chọn thư mục trên máy tính</b>, hoặc bấm chuột phải biểu tượng khay ▸ Đổi thư mục nhận tệp. Hộp thoại hiện trên màn hình máy tính nên cần ngồi tại máy.</p>' },
+        { h: 'Biểu tượng ở khay', b:
+          '<ul><li><b>Mở bảng điều khiển:</b> bấm đúp biểu tượng vàng, hoặc bấm chuột phải rồi chọn.</li>' +
+          '<li><b>Đổi thư mục, xem nhật ký, chạy cùng Windows, ngăn máy ngủ:</b> nằm trong menu chuột phải.</li>' +
+          '<li><b>Thoát:</b> máy ngừng nhận cho tới lần đăng nhập sau, hoặc tới khi anh mở lại.</li></ul>' },
+        { h: 'Tốc độ thực tế', b:
+          '<table><tr><th>Trường hợp</th><th>Thực tế</th></tr>' +
+          '<tr><td>Cùng mạng Wi-Fi</td><td>Thường 8 tới 40 MB/s, tuỳ router và điện thoại</td></tr>' +
+          '<tr><td>Nhiều ảnh nhỏ</td><td>Chậm hơn một tệp lớn, vì mỗi tệp là một yêu cầu riêng</td></tr>' +
+          '<tr><td>Một video dài</td><td>Nhanh nhất, nhớ giữ màn hình sáng</td></tr>' +
+          '<tr><td>Tệp trên 2 GB</td><td>Safari có thể đứt, nên gửi thành nhóm nhỏ hơn</td></tr>' +
+          '<tr><td>Cắm dây mạng</td><td>Phía máy tính không phải nút cổ chai, Wi-Fi mới là</td></tr></table>' +
+          '<p>Tab Tổng quan hiện tốc độ cao nhất, thấp nhất và trung bình của lần gần nhất, tab Lịch sử giữ số liệu của mọi lần đã chia sẻ.</p>' },
+        { h: 'Khi có trục trặc', b:
+          '<ul>' +
+          '<li><b>iPhone báo lỗi, không thấy tệp:</b> kiểm tra đang cùng mạng Wi-Fi và địa chỉ còn đúng mã khoá hiện tại không (tab Cài đặt ▸ Mã khoá kết nối).</li>' +
+          '<li><b>Trang trên điện thoại báo 403:</b> sai hoặc cũ mã khoá. Quét lại mã QR.</li>' +
+          '<li><b>Nhận từ PC không thấy tệp nào:</b> hiện không có tệp nào được chia sẻ, hoặc anh vừa dừng chia sẻ. Chọn tệp lại trên máy tính rồi bấm Tải lại danh sách trên điện thoại.</li>' +
+          '<li><b>Tệp đang chia sẻ báo lỗi thay vì tải:</b> tệp đó đã bị di chuyển, đổi tên hoặc xoá trên máy tính, hoặc anh dừng chia sẻ giữa lúc đang tải. Chọn lại tệp trên máy tính.</li>' +
+          '<li><b>Báo 429 hoặc bị khoá một phút:</b> thiết bị đó đã nhập sai mã khoá quá nhiều lần. Chờ một phút.</li>' +
+          '<li><b>Đang gửi thì dừng hoặc chạy lại từ đầu:</b> iPhone đã khoá màn hình hoặc rời Wi-Fi. Mở lại trang và chọn đúng tệp đó, nó chạy tiếp.</li>' +
+          '<li><b>Ổ đĩa đầy:</b> máy tính hiện bong bóng cảnh báo và ghi vào nhật ký. Điện thoại có thể chỉ báo lỗi kết nối, vì Windows không thể trả lời trước khi đọc hết yêu cầu. Giải phóng dung lượng rồi gửi lại, tệp vẫn còn trong Ảnh.</li>' +
+          '<li><b>Cổng đang bị chiếm:</b> chương trình khác đã dùng cổng 8765. Chạy lại install.bat, hoặc đổi cổng trong adamdrop.ini rồi mở lại.</li>' +
+          '<li><b>Cảnh báo mạng Công cộng:</b> ở mạng công cộng, cổng mở cho mọi người trong mạng đó, mã khoá là ổ khoá duy nhất. Nên dùng mạng Riêng tư.</li>' +
+          '<li><b>Sau khi Windows cập nhật thì không nhận được:</b> chạy lại install.bat bằng quyền quản trị một lần, nó khôi phục luật tường lửa và phần dành riêng cổng.</li>' +
+          '</ul>' },
+        { h: 'An toàn và riêng tư', b:
+          '<ul><li>Tệp chỉ đi trong mạng nhà. AdamDrop không tải gì lên mạng cả.</li>' +
+          '<li>Mọi yêu cầu phải có mã khoá kết nối. Mã khoá không bao giờ được ghi vào nhật ký.</li>' +
+          '<li>Bảng điều khiển chỉ mở được từ chính máy tính, không mở từ trong mạng.</li>' +
+          '<li>Sai mã khoá 20 lần trong một phút thì thiết bị đó bị khoá một phút.</li>' +
+          '<li>Ứng dụng không chạy dưới quyền quản trị và không đụng tới thư mục nào khác ngoài thư mục nhận anh chọn.</li>' +
+          '<li>Chiều gửi sang iPhone chỉ gồm đúng những tệp anh chọn trong hộp thoại Windows. Không thư mục nào của máy tính bị mở ra, và điện thoại không hề biết đường dẫn của tệp.</li></ul>' },
+        { h: 'Những tệp ứng dụng giữ lại', b:
+          '<ul><li><span class="k">adamdrop.ini</span> cấu hình, cổng, mã khoá, thư mục nhận</li>' +
+          '<li><span class="k">adamdrop.log</span> 200 sự việc gần nhất, tự xoay vòng</li>' +
+          '<li><span class="k">history.tsv</span> mỗi lần chia sẻ một dòng, giữ tới 2000 lần</li>' +
+          '<li><span class="k">recent.tsv</span> 30 tệp nhận gần nhất cho danh sách ở Tổng quan</li></ul>' +
+          '<p>Gỡ ứng dụng: chạy <span class="k">uninstall.bat</span> rồi xoá thư mục này. Tệp anh đã nhận vẫn nằm nguyên chỗ cũ.</p>' }
+      ]
+    };
+    var list = g[lang] || g.en, html = '';
+    for (var i = 0; i < list.length; i++) html += '<h3>' + list[i].h + '</h3>' + list[i].b;
+    $('guideBody').innerHTML = html;
+    drawShortcutQr();
+  }
+
+  function buildAbout() {
+    var a = {
+      en: '<p>AdamDrop is a small, local, free tool: move files both ways between an iPhone and a Windows PC over your own Wi-Fi, with a QR code and no cloud account. It runs in the tray, keeps a share history with real speed numbers, and shows everything on one clean screen.</p>' +
+          '<p>Built for everyday use on a real desk: one file at a time or a hundred, resume after a dropped Wi-Fi, no data leaving your network.</p>',
+      vi: '<p>AdamDrop là công cụ nhỏ, chạy tại máy, miễn phí: gửi và nhận tệp hai chiều giữa iPhone và máy tính Windows qua chính mạng Wi-Fi nhà, bằng mã QR, không cần tài khoản đám mây. Nó nằm ở khay hệ thống, ghi lại lịch sử chia sẻ kèm số tốc độ thật, và bày mọi thứ trên một màn hình gọn.</p>' +
+          '<p>Làm để dùng hằng ngày trên bàn làm việc thật: một tệp hay một trăm tệp, đứt Wi-Fi vẫn gửi tiếp, không có dữ liệu nào rời khỏi mạng nhà.</p>'
+    };
+    var f = {
+      en: '<p><b>Adam Wang</b> develops practical software focused on <b>automation, data and AI tools</b> for real-world workflows.</p>' +
+          '<p>Products are built with an <b>AI-assisted team</b> in a simple, transparent and controllable way: complex workflows turn into easy tools that save time and give users more control. AdamDrop is one of them.</p>' +
+          '<p>AI works as a <b>supporting team member</b>: researching ideas, building prototypes, writing and testing code, writing docs, reviewing the experience. Goals, verification and release decisions stay with the maker.</p>' +
+          '<p class="muted">Adam Uses AI · Learning with intent, building with purpose.</p>' +
+          '<p><b>Official channels:</b> <a href="https://adamusesai.com" target="_blank" rel="noopener">adamusesai.com</a> · ' +
+          '<a href="https://www.youtube.com/@adamdungai" target="_blank" rel="noopener">YouTube @adamdungai</a> · ' +
+          '<a href="https://www.facebook.com/1341439692379325" target="_blank" rel="noopener">Facebook</a> · ' +
+          '<a href="https://github.com/adamwang99" target="_blank" rel="noopener">GitHub adamwang99</a></p>',
+      vi: '<p><b>Adam Wang</b> (Vương Hoàng Tuấn) là nhà phát triển các phần mềm tập trung vào <b>tự động hoá, dữ liệu, công cụ AI</b> và những quy trình làm việc thực tế.</p>' +
+          '<p>Sản phẩm được xây dựng cùng <b>đội ngũ tác nhân AI</b> theo hướng đơn giản, minh bạch và có thể kiểm soát: biến quy trình phức tạp thành công cụ dễ dùng, giúp người dùng tiết kiệm thời gian và chủ động hơn trong công việc. AdamDrop là một trong số đó.</p>' +
+          '<p>AI làm việc như <b>thành viên hỗ trợ</b>: nghiên cứu ý tưởng, dựng bản thử, viết và kiểm tra mã, soạn tài liệu, rà soát trải nghiệm. Mục tiêu, kiểm tra kết quả và quyết định phát hành vẫn thuộc về người làm.</p>' +
+          '<p class="muted">Adam Dùng AI · Học có chọn lọc, làm có mục tiêu.</p>' +
+          '<p><b>Kênh chính thức:</b> <a href="https://adamusesai.com" target="_blank" rel="noopener">adamusesai.com</a> · ' +
+          '<a href="https://www.youtube.com/@adamdungai" target="_blank" rel="noopener">YouTube @adamdungai</a> · ' +
+          '<a href="https://www.facebook.com/1341439692379325" target="_blank" rel="noopener">Facebook</a> · ' +
+          '<a href="https://github.com/adamwang99" target="_blank" rel="noopener">GitHub adamwang99</a></p>'
+    };
+    $('aboutBody').innerHTML = a[lang] || a.en;
+    $('founderBody').innerHTML = f[lang] || f.en;
+  }
+
+  /* ---------------- controls ---------------- */
+  $('btnQrHost').onclick = function () {
+    wantHost = !wantHost;
+    this.textContent = wantHost ? t('ov.qrIp') : t('ov.qrFixed');
+    qrUrl = null; poll();
+  };
+  function copyAddr() { try { navigator.clipboard.writeText(qrUrl || ''); flash(t('copy.done')); } catch (e) {} }
+  $('btnCopy').onclick = copyAddr;
+  $('qrUrl').onclick = copyAddr;
+  $('btnOpenDir').onclick = function () { post('/api/open', true); };
+  $('btnOpenDir2').onclick = function () { post('/api/open', true); };
+  $('btnPick').onclick = function () {
+    $('pickHint').textContent = t('set.waitPick');
+    fetch('/api/pickfolder').then(function (r) { return r.json(); }).then(function (j) {
+      $('pickHint').textContent = j.ok ? t('set.picked', { d: j.saveDir }) : (j.cancelled ? t('set.pickCancel') : (j.message || t('set.pickFail')));
+      flash($('pickHint').textContent);
+      setTimeout(poll, 300);
+    }).catch(function () { $('pickHint').textContent = t('set.pickFail'); });
+  };
+  $('btnNewKey').onclick = function () {
+    if (!confirm(t('set.keyConfirm'))) return;
+    post('/api/set?newkey=1', true);
+  };
+  $('btnHistReload').onclick = loadHist;
+  $('days').onchange = loadHist;
+  $('segHist').onclick = function () { setHistPane('hist'); };
+  $('segLog').onclick = function () { setHistPane('log'); };
+  $('btnLogReload').onclick = loadLog;
+  $('btnOpenLog').onclick = function () { post('/api/open?name=__log__', true); };
+  $('optAutoOpen').onchange = function () { post('/api/set?openfolder=' + (this.checked ? 1 : 0), true); };
+  $('optAwake').onchange = function () { post('/api/set?keepawake=' + (this.checked ? 1 : 0), true); };
+  $('optAutoRun').onchange = function () { post('/api/set?autostart=' + (this.checked ? 1 : 0), true); };
+  $('langEn').onclick = function () { setLang('en', true); };
+  $('langVi').onclick = function () { setLang('vi', true); };
+
+  function poll() {
+    fetch('/api/state').then(function (r) { return r.json(); }).then(render).catch(function () {
+      $('pills').innerHTML = '<span class="pill warn">' + t('lost') + '</span>';
+    });
+  }
+
+  // Ngôn ngữ: ưu tiên lựa chọn đã lưu trên máy này, sau đó tới thiết lập của app, mặc định tiếng Anh
+  try { lang = localStorage.getItem('adamdrop.lang') || 'en'; } catch (e) {}
+  applyLang();
+  fetch('/api/state').then(function (r) { return r.json(); }).then(function (s) {
+    var saved;
+    try { saved = localStorage.getItem('adamdrop.lang'); } catch (e) { saved = null; }
+    if (!saved && s.lang && s.lang !== lang) { lang = s.lang; applyLang(); }
+    render(s);
+  }).catch(function () { poll(); });
+
+  setInterval(function () {
+    if (tab === 'ov' || tab === 'conn' || tab === 'about') poll();
+    if (tab === 'log') loadLog();
+  }, 2000);
+})();
+</script>
+</body>
+</html>

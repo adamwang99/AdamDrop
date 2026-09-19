@@ -1,0 +1,15 @@
+* text=auto eol=crlf
+*.cs text
+*.html text
+*.js text
+*.py text eol=lf
+*.txt text
+*.md text
+*.bat text eol=crlf
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.shortcut binary
+*.exe binary
+*.pdf binary

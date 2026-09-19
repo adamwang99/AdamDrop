@@ -1,0 +1,40 @@
+# ============================================================
+#  AdamDrop - nhung thu KHONG BAO GIO dua len kho cong khai
+# ============================================================
+
+# --- Du lieu cua may nay: adamdrop.ini chua MA KHOA rieng cua ban
+adamdrop.ini
+adamdrop.ini.bak
+*.ini
+
+# --- Nhat ky va lich su truyen tep (tep ca nhan)
+adamdrop.log
+adamdrop.log.bak*
+history.tsv
+history.tsv.bak*
+recent.tsv
+recent.tsv.bak*
+
+# --- Ban da bien dich: moi nguoi tu build lay (xem build.bat / install.bat)
+AdamDrop.exe
+*.exe
+!docs/*.png
+
+# --- Tep phim tat dung san: chua MA KHOA cua may da sinh ra no
+#     Muon tao lai cho may ban: python tools/lam-shortcut.py <ten-may>:8765 <ma-khoa>
+web/AdamDrop.shortcut
+web/AdamDrop.auto.shortcut
+*.shortcut
+
+# --- Ban sao luu tam khi sua giao dien
+*.bak
+*.bak-*
+web/*.bak-*
+web/guide/*.bak-*
+
+# --- Tep tam cua he thong
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.tmp/
