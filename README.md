@@ -5,7 +5,7 @@ Không cáp, không tài khoản, không đăng nhập, không đi qua máy ch�
 
 ![Windows 10 và 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
 ![.NET Framework 4](https://img.shields.io/badge/.NET%20Framework-4.x-512BD4)
-![Một tệp exe ~930 KB](https://img.shields.io/badge/1%20t%E1%BB%87p%20exe-~930%20KB-orange)
+![Một tệp exe ~1 MB](https://img.shields.io/badge/1%20t%E1%BB%87p%20exe-~1%20MB-orange)
 ![Không cần tài khoản](https://img.shields.io/badge/kh%C3%B4ng%20c%E1%BA%A7n-t%C3%A0i%20kho%E1%BA%A3n-lightgrey)
 ![Giấy phép MIT](https://img.shields.io/badge/gi%E1%BA%A5y%20ph%C3%A9p-MIT-green)
 
@@ -30,7 +30,7 @@ AdamDrop đi thẳng trong nhà bạn. PC mở một máy chủ nhỏ, iPhone qu
 - **Đứt Wi-Fi vẫn gửi tiếp.** Tệp được chia thành từng khối 8 MB kèm mã kiểm tra SHA-256; mất mạng hay khoá màn hình thì lần sau nó chạy tiếp đúng chỗ dừng, không gửi lại từ đầu.
 - **Giữ nguyên bản gốc.** Không nén, không đổi tên, không đụng vào ngày chụp. Máy nhận đối chiếu SHA-256 nên biết chắc tệp đã về nguyên vẹn.
 - **Vào Tệp hoặc vào Ảnh.** Ảnh và video có thêm đường lưu thẳng vào thư viện Ảnh của iPhone, các tệp khác thì vào Tệp.
-- **Nhẹ thật.** Một tệp `AdamDrop.exe` khoảng 930 KB, toàn bộ giao diện nhúng bên trong. Không cài runtime, không service, không driver, không thư viện ngoài.
+- **Nhẹ thật.** Một tệp `AdamDrop.exe` khoảng 1 MB, toàn bộ giao diện nhúng bên trong. Không cài runtime, không service, không driver, không thư viện ngoài.
 - **Nằm trong khay hệ thống.** Đóng cửa sổ là nó thu về khay và vẫn nhận tệp. Bật máy là tự chạy.
 - **Lịch sử có số thật.** Mỗi đợt nhận ghi lại số tệp, dung lượng, thời gian, tốc độ cao nhất / thấp nhất / trung bình và cả thư mục đã lưu, để lần sau bạn biết tệp nằm ở đâu.
 - **Song ngữ Anh – Việt**, mặc định tiếng Anh, đổi bằng một nút ở góc phải.
@@ -170,7 +170,7 @@ AdamDrop stays inside your home. Your PC opens a tiny server, your iPhone scans 
 - **Survives a dropped Wi-Fi.** Files travel in 8 MB chunks with SHA-256 checksums, so after a disconnect or a locked screen the next run resumes exactly where it stopped instead of starting over.
 - **Originals, untouched.** No compression, no renaming, no touching capture dates. The receiving side verifies SHA-256, so you know the file arrived intact.
 - **Save to Files or Save to Photos.** Images and videos also have a route straight into the iPhone Photos library; everything else goes to Files.
-- **Genuinely light.** One `AdamDrop.exe`, about 930 KB, with the whole interface embedded. No runtime, no service, no driver, no third-party library.
+- **Genuinely light.** One `AdamDrop.exe`, about 1 MB, with the whole interface embedded. No runtime, no service, no driver, no third-party library.
 - **Lives in the tray.** Close the window and it drops back to the tray, still receiving. It starts with Windows.
 - **Real history.** Every receiving batch records file count, size, duration, peak / lowest / average speed and the folder it was saved to, so you can find things later.
 - **English and Vietnamese**, English by default, one button to switch.

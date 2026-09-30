@@ -9,7 +9,7 @@ try:
 except urllib.error.URLError:
     pass
 csc=Path(os.environ['WINDIR'])/'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
-args=[str(csc),'/nologo','/codepage:65001','/target:winexe','/optimize+','/out:'+str(root/'AdamDrop.exe'),'/r:System.Windows.Forms.dll','/r:System.Drawing.dll']
+args=[str(csc),'/nologo','/codepage:65001','/target:winexe','/optimize+','/out:'+str(root/'AdamDrop.exe'),'/win32icon:'+str(root/'web'/'logo.ico'),'/r:System.Windows.Forms.dll','/r:System.Drawing.dll']
 for f in (root/'web').rglob('*'):
     if f.is_file() and (f.parent==root/'web' and f.suffix in ('.html','.js','.png','.ico','.shortcut') or f.parent.name=='guide' and f.suffix=='.png'):
         args.append('/resource:'+str(f)+',web.'+str(f.relative_to(root/'web')).replace('\\','.').replace('/','.'))

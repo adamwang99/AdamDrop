@@ -34,7 +34,7 @@ if exist "web\AdamDrop.shortcut" set "RES=!RES! /resource:web\AdamDrop.shortcut,
 if exist "web\AdamDrop.auto.shortcut" set "RES=!RES! /resource:web\AdamDrop.auto.shortcut,web.AdamDrop.auto.shortcut"
 for %%F in (web\guide\*.png) do set "RES=!RES! /resource:%%F,web.guide.%%~nxF"
 if exist "%CSC%" (
-"%CSC%" /nologo /codepage:65001 /target:winexe /optimize+ /out:AdamDrop.exe /r:System.Windows.Forms.dll /r:System.Drawing.dll %RES% AdamDrop.cs
+"%CSC%" /nologo /codepage:65001 /target:winexe /optimize+ /out:AdamDrop.exe /win32icon:web\logo.ico /r:System.Windows.Forms.dll /r:System.Drawing.dll %RES% AdamDrop.cs
 if errorlevel 1 (
   echo [LOI] Bien dich that bai.
   pause
